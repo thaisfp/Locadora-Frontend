@@ -1,9 +1,9 @@
-import {  AtorCreate, AtoresArray, AtorUpdate } from "@/model/ator";
+import {  Ator, AtorCreate, AtoresArray, AtorUpdate } from "@/model/ator";
 import api from "@/server/server";
 import { useState } from "react"
 
 export const useAtorHook = () => {
-    // const [ator, setAtor] = useState<Ator | null>(null);
+    const [ator, setAtor] = useState<Ator | null>(null);
     const [atores, setAtores] = useState<AtoresArray | null>(null);
 
     const criarAtor = async (ator: AtorCreate): Promise<void> => {
@@ -28,5 +28,12 @@ export const useAtorHook = () => {
         }
     }
 
-    return {criarAtor, deletarAtor, editarAtor, listarAtores, atores}
+    const selecionarAtor = async (atorId: string) => {
+        const response = await api.get(`ator/listar/${atorId}`);
+        if (response.data) {
+            setAtor(response.data);
+        }
+    }
+
+    return {criarAtor, deletarAtor, editarAtor, listarAtores, selecionarAtor, atores, ator}
 }

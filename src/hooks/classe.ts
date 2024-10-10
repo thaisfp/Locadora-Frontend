@@ -1,10 +1,10 @@
-import { ClasseCreate, ClassesArray, ClasseUpdate } from "@/model/classe";
+import { Classe, ClasseCreate, ClassesArray, ClasseUpdate } from "@/model/classe";
 import api from "@/server/server";
 import { useState } from "react";
 
 export const useClasseHook = () => {
-    // const [Classe, setClasse] = useState<Classe | null>(null);
-    const [Classes, setClassees] = useState<ClassesArray | null>(null);
+    const [classe, setClasse] = useState<Classe | null>(null);
+    const [classes, setClassees] = useState<ClassesArray | null>(null);
 
     const criarClasse = async (Classe: ClasseCreate): Promise<void> => {
         const response = await api.post('criar', Classe);
@@ -28,5 +28,12 @@ export const useClasseHook = () => {
         }
     }
 
-    return {criarClasse, deletarClasse, editarClasse, listarClasses, Classes}
+    const selecionarClasse = async (classeId: string) => {
+        const response = await api.get(`ator/listar/${classeId}`);
+        if (response.data) {
+            setClasse(response.data);
+        }
+    }
+
+    return {criarClasse, deletarClasse, editarClasse, listarClasses, classe, classes, selecionarClasse}
 }

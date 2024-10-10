@@ -32,18 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Trash2, UserPen } from "lucide-react"
-
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    nome: "Ian",
-  },
-  {
-    id: "3u1reuv4",
-    nome: "Abe45@gmail.com",
-  },
-
-]
+import { AtoresArray } from "@/model/ator"
 
 export type Payment = {
   id: string
@@ -83,8 +72,9 @@ export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: "acoes",
     header: "Ação",
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cell: ({ row }) => (
-      <div className="flex capitalize gap-5">
+      <div className="flex gap-5 justify-end">
         <Button className="bg-slate-300 hover:bg-sky-700 ">
           <UserPen />
         </Button>
@@ -99,7 +89,12 @@ export const columns: ColumnDef<Payment>[] = [
  
 ]
 
-export function DataTableAtor() {
+interface PropsAtor{
+  atores: AtoresArray;
+}
+
+export function DataTableAtor({atores}: PropsAtor) {
+
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -109,7 +104,7 @@ export function DataTableAtor() {
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
-    data,
+    data: atores ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

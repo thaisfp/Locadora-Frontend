@@ -1,9 +1,10 @@
-import { DiretorCreate, DiretoresArray, DiretorUpdate } from "@/model/diretor";
+import { Diretor, DiretorCreate, DiretoresArray, DiretorUpdate } from "@/model/diretor";
 import api from "@/server/server";
 import { useState } from "react";
 
 export const useDiretorHook = () => {
-    const [Diretores, setDiretores] = useState<DiretoresArray | null>(null);
+    const [diretor, setDiretor ] = useState<Diretor | null> (null);
+    const [diretores, setDiretores] = useState<DiretoresArray | null>(null);
 
     const criarDiretor = async (Diretor: DiretorCreate): Promise<void> => {
         const response = await api.post('criar', Diretor);
@@ -27,5 +28,12 @@ export const useDiretorHook = () => {
         }
     }
 
-    return {criarDiretor, deletarDiretor, editarDiretor, listarDiretores, Diretores}
+    const selecionarDiretor = async (diretorId: string) => {
+        const response = await api.get(`ator/listar/${diretorId}`);
+        if (response.data) {
+            setDiretor(response.data);
+        }
+    }
+
+    return {criarDiretor, deletarDiretor, editarDiretor, listarDiretores, selecionarDiretor,diretor, diretores}
 }

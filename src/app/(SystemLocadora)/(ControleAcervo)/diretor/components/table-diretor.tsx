@@ -31,17 +31,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Trash2, UserPen } from "lucide-react";
-
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    nome: "Ian",
-  },
-  {
-    id: "3u1reuv4",
-    nome: "Abe45@gmail.com",
-  },
-];
+import { DiretoresArray } from "@/model/diretor";
 
 export type Payment = {
   id: string;
@@ -79,6 +69,7 @@ export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: "acoes",
     header: "Ação",
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cell: ({ row }) => (
       <div className="flex capitalize gap-5">
         <Button className="bg-slate-300 hover:bg-sky-700 ">
@@ -94,7 +85,10 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ];
 
-export function DataTableDiretor() {
+interface DiretorProps{
+  diretores: DiretoresArray;
+}
+export function DataTableDiretor({diretores}: DiretorProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -104,7 +98,7 @@ export function DataTableDiretor() {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data,
+    data : diretores ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
