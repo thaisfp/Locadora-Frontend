@@ -16,12 +16,9 @@ import { Ator } from "@/model/ator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Dialog,
-  DialogContent,
-  
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { UserPen } from "lucide-react";
+import { useState } from "react";
 
 interface PropsAtor {
   ator?: Ator;
@@ -29,6 +26,7 @@ interface PropsAtor {
 
 export function FormNovoAtor({ ator }: PropsAtor) {
   const { criarAtor, editarAtor } = useAtorHook();
+  const [isOpen, setIsOpen] = useState(false);
 
   const formSchema = z.object({
     nome: z.string().min(1, { message: "Nome do Ator é obrigatório!" }),
@@ -36,9 +34,11 @@ export function FormNovoAtor({ ator }: PropsAtor) {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      nome: "",
-    },
+    defaultValues: ator
+      ? {
+          nome: ator.nome || "",
+        }
+      : {},
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -67,6 +67,9 @@ export function FormNovoAtor({ ator }: PropsAtor) {
           description: "Ator criado com sucesso",
         });
       }
+
+      setIsOpen(false);
+
     } catch {
       toast({
         title: "Erro!",
@@ -77,15 +80,28 @@ export function FormNovoAtor({ ator }: PropsAtor) {
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="bg-sky-700 shadow-md w-1/6 text-lg text-slate-50 hover:bg-slate-400 ">Novo Ator</Button>
+        {ator ? (
+          <Button
+            variant="outline"
+            className="bg-slate-300 hover:bg-sky-700 shadow-md w-full text-lg text-slate-50 hover:text-white"
+          >
+            <UserPen />
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            className="bg-sky-700 shadow-md w-1/6 text-lg text-slate-50 hover:bg-slate-400 "
+          >
+            Novo Ator
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <div className="grid gap-4 py-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              
               <div className="flex h-alto items-center justify-start">
                 <div className="w-full">
                   <FormField
@@ -107,22 +123,22 @@ export function FormNovoAtor({ ator }: PropsAtor) {
                 </div>
               </div>
               <div className="flex w-full items-center justify-center gap-5">
-                  <Button
-                    type="submit"
-                    className="bg-sky-700 shadow-md w-1/2 text-lg hover:bg-slate-400 "
-                  >
-                    Salvar
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="bg-slate-400  shadow-md w-1/2 text-lg "
-                  >
-                    Cancelar
-                  </Button>
-                </div>
+                <Button
+                  type="submit"
+                  className="bg-sky-700 shadow-md w-1/2 text-lg hover:bg-slate-400 "
+                >
+                  Salvar
+                </Button>
+                <Button
+                  type="button"
+                  className="bg-slate-400  shadow-md w-1/2 text-lg "
+                  onClick={() => setIsOpen(false)}
+                >
+                  Cancelar
+                </Button>
+              </div>
             </form>
           </Form>
-         
         </div>
       </DialogContent>
     </Dialog>

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,17 +12,16 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -30,16 +29,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Trash2, UserPen } from "lucide-react"
-import { AtoresArray } from "@/model/ator"
+} from "@/components/ui/table";
+import { ArrowUpDown, Trash2 } from "lucide-react";
+import { Ator, AtoresArray } from "@/model/ator";
+import EditarAtor from "../editarAtor/[id]/page";
+import { DialogDeletarAtor } from "./dialog-remover-ator";
 
 export type Payment = {
-  id: string
-  nome: string
-}
+  id: string;
+  nome: string;
+};
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Ator>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -64,44 +65,53 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "nome",
-    header: "Nome do Ator",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="w-full gap-2"
+        >
+          Nome do Ator
+          <ArrowUpDown className="w-4"></ArrowUpDown>
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("nome")}</div>
+      <div className="pl-3 flex justify-center ">{row.getValue("nome")}</div>
     ),
   },
   {
     accessorKey: "acoes",
-    header: "Ação",
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    header: ({}) => {
+      return (
+        <Button variant="ghost" className="w-full">
+          Ações
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div className="flex gap-5 justify-end">
-        <Button className="bg-slate-300 hover:bg-sky-700 ">
-          <UserPen />
-        </Button>
-        
-        <Button className="bg-slate-300 hover:bg-sky-700 ">
-          <Trash2 />
-        </Button>
+      <div className="flex gap-5 justify-center ">
+        <EditarAtor id={row.original.id}></EditarAtor>
 
+        <DialogDeletarAtor atorId={row.original.id}/>
       </div>
     ),
   },
- 
-]
+];
 
-interface PropsAtor{
+interface PropsAtor {
   atores: AtoresArray;
 }
 
-export function DataTableAtor({atores}: PropsAtor) {
-
-  const [sorting, setSorting] = React.useState<SortingState>([])
+export function DataTableAtor({ atores }: PropsAtor) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
+  );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data: atores ?? [],
@@ -120,7 +130,7 @@ export function DataTableAtor({atores}: PropsAtor) {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
     <div className="w-full">
@@ -134,7 +144,6 @@ export function DataTableAtor({atores}: PropsAtor) {
           className="max-w-sm"
         />
         <DropdownMenu>
-    
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
@@ -151,7 +160,7 @@ export function DataTableAtor({atores}: PropsAtor) {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -171,7 +180,7 @@ export function DataTableAtor({atores}: PropsAtor) {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -231,5 +240,5 @@ export function DataTableAtor({atores}: PropsAtor) {
         </div>
       </div>
     </div>
-  )
+  );
 }
