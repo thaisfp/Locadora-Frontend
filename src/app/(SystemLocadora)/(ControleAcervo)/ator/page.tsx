@@ -13,7 +13,7 @@ export default function Ator() {
   useEffect(() => {
     setIsLoading(true);
     listarAtores();
-  }, [listarAtores]);
+  }, []);
 
   return (
     <ScrollArea className="h-screen">
