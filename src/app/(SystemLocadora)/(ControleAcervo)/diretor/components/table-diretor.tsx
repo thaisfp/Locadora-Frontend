@@ -30,8 +30,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2, UserPen } from "lucide-react";
 import { DiretoresArray } from "@/model/diretor";
+import { DialogDeletarDiretor } from "./dialog-form-diretor";
+import EditarDiretor from "../editarDiretor/[id]/page";
 
 export type Payment = {
   id: string;
@@ -71,15 +72,10 @@ export const columns: ColumnDef<Payment>[] = [
     header: "Ação",
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cell: ({ row }) => (
-      <div className="flex capitalize gap-5">
-        <Button className="bg-slate-300 hover:bg-sky-700 ">
-          <UserPen />
-        </Button>
-        
-        <Button className="bg-slate-300 hover:bg-sky-700 ">
-          <Trash2 />
-        </Button>
+      <div className="flex gap-5 justify-center ">
+        <EditarDiretor id={row.original.id}></EditarDiretor>
 
+        <DialogDeletarDiretor diretorId={row.original.id}/>
       </div>
     ),
   },

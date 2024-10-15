@@ -29,7 +29,7 @@ export const useDiretorHook = () => {
     }
 
     const selecionarDiretor = async (diretorId: string) => {
-        const response = await api.get(`diretor/ator/listar/${diretorId}`);
+        const response = await api.get(`diretor/listar/${diretorId}`);
         if (response.data) {
             setDiretor(response.data);
         }

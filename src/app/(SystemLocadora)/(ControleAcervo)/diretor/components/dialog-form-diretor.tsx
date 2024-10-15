@@ -1,87 +1,74 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
+import { useDiretorHook } from "@/hooks/diretor";
+import { Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-export function FormNovoDiretor() {
-  const formSchema = z.object({
-    nome: z.string().min(1, { message: "Nome do Diretor é obrigatório!" }),
-  });
+interface IdDiretorProps {
+  diretorId: string;
+}
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      nome: "",
-    },
-  });
+export function DialogDeletarDiretor({ diretorId }: IdDiretorProps) {
+  const { deletarDiretor } = useDiretorHook();
+  const router = useRouter();
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function removerDiretor(diretorId: string) {
+    deletarDiretor(diretorId)
+      .then((response) => {
+        router.refresh();
+        toast({
+          title: "Sucesso!",
+          description:
+            "O diretor foi removido com sucesso!",
+        });
+      })
+      .catch((response) => {
+        toast({
+          title: "Erro!",
+          description:
+            "Não foi possível remover este diretor neste momento, tente mais tarde!",
+          variant: "destructive",
+        });
+      });
   }
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="bg-sky-700 shadow-md w-1/6 text-lg text-slate-50 hover:bg-slate-400 "
-        >
-          Novo Diretor
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <div className="grid gap-4 py-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="flex h-alto items-center justify-start">
-                <div className="w-full">
-                  <FormField
-                    control={form.control}
-                    name="nome"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nome do Diretor</FormLabel>
-                        <FormControl>
-                          <Input
-                            className="border border-[#A7A7A7] "
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-              <div className="flex w-full items-center justify-center gap-5">
-                <Button
-                  type="submit"
-                  className="bg-sky-700 shadow-md w-1/2 text-lg hover:bg-slate-400 "
-                >
-                  Salvar
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-slate-400  shadow-md w-1/2 text-lg "
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <>
+      <AlertDialog>
+        <AlertDialogTrigger>
+          <Button className="bg-slate-300 hover:bg-sky-700 ">
+            <Trash2 />
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Tem certeza que deseja remover este diretor?
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex gap-5">
+              <AlertDialogAction
+                className="bg-sky-700 hover:bg-slate-300 shadow-md w-full text-lg text-slate-50 hover:text-white"
+                onClick={() => removerDiretor(diretorId)}
+              >
+                Sim
+              </AlertDialogAction>
+              <AlertDialogCancel className="bg-slate-300 hover:bg-slate-300 shadow-md w-full text-lg text-slate-50 hover:text-white">Não</AlertDialogCancel>
+            </AlertDialogFooter>
+          </>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
