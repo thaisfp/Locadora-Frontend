@@ -1,53 +1,32 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { DataTableClasse } from "./components/table-classe";
-import { FormNovaClasse } from "./components/form-classe";
+import { DataTableClasse } from "./components/table-classe"; 
+import { useClasseHook } from "@/hooks/classe"; 
+import { FormNovaClasse } from "./novaClasse/components/dialog-form-classe"; 
+import { useEffect, useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-export default function Diretor() {
-  const [mostrarForm, setMostrarForm] = useState(false);
+export default function Classe() {
+  const { classes, listarClasses } = useClasseHook(); 
+  const [isLoading, setIsLoading] = useState(true);
 
-  const habilitarFormulario = () => {
-    setMostrarForm(!mostrarForm);
-  };
+  useEffect(() => {
+    setIsLoading(true);
+    listarClasses();
+  }, []);
 
   return (
-    <div className="w-full h-screen p-10 ">
-      {mostrarForm ? (
-        <div className="flex h-full flex-row">
-          <div className="w-1/2  p-10 border">
-            <div className="flex justify-end">
-              <Button
-                className="bg-slate-400 shadow-md w-1/3 text-lg hover:bg-sky-700 "
-                onClick={habilitarFormulario}
-              >
-                {mostrarForm ? "Cancelar" : "Novo Ator"}
-              </Button>
-            </div>
-            <div>
-              <DataTableClasse />
-            </div>
-          </div>
-          <div className="w-1/2">
-            <FormNovaClasse />
-          </div>
-        </div>
-      ) : (
+    <ScrollArea className="h-screen">
+      <div className="w-full h-screen p-10 ">
         <div className="w-full h-full p-10">
           <div className="flex justify-end">
-            <Button
-              className="bg-slate-400 shadow-md w-1/5 text-lg hover:bg-sky-700 "
-              onClick={habilitarFormulario}
-            >
-              Nova Classe
-            </Button>
+            <FormNovaClasse></FormNovaClasse> 
           </div>
           <div>
-            <DataTableClasse />
+            <DataTableClasse classes={classes!}></DataTableClasse>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+    </ScrollArea>
   );
 }

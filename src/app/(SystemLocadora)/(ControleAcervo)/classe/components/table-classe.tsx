@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,17 +12,16 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -30,27 +29,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Trash2, UserPen } from "lucide-react"
-
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    nome: "Ian",
-  },
-  {
-    id: "3u1reuv4",
-    nome: "Abe45@gmail.com",
-  },
-
-]
+} from "@/components/ui/table";
+import { ArrowUpDown, Trash2 } from "lucide-react";
+import { Classe, ClassesArray } from "@/model/classe";
+import EditarClasse from "../editarClasse/[id]/page";
+import { DialogDeletarClasse } from "./dialog-remover-classe";
 
 export type Payment = {
-  id: string
-  nome: string
-}
+  id: string;
+  nome: string;
+  valor: number;
+  dataDevolucao: Date;
+};
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Classe>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -75,55 +67,92 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "nome",
-    header: "Nome da Classe",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="w-full gap-2"
+        >
+          Nome da Classe
+          <ArrowUpDown className="w-4"></ArrowUpDown>
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("nome")}</div>
+      <div className="pl-3 flex justify-center ">{row.getValue("nome")}</div>
     ),
   },
   {
     accessorKey: "valor",
-    header: "Valor",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="w-full gap-2"
+        >
+          Valor
+          <ArrowUpDown className="w-4"></ArrowUpDown>
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("valor")}</div>
+      <div className="pl-3 flex justify-center ">{row.getValue("valor")}</div>
     ),
   },
   {
     accessorKey: "dataDevolucao",
-    header: "Data de Devolução",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="w-full gap-2"
+        >
+          Data de Devolução
+          <ArrowUpDown className="w-4"></ArrowUpDown>
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("dataDevolucao")}</div>
+      <div className="pl-3 flex justify-center ">{row.getValue("dataDevolucao")}</div>
     ),
   },
   {
     accessorKey: "acoes",
-    header: "Ação",
+    header: ({}) => {
+      return (
+        <Button variant="ghost" className="w-full">
+          Ações
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div className="flex capitalize gap-5">
-        <Button className="bg-slate-300 hover:bg-sky-700 ">
-          <UserPen />
-        </Button>
-        
-        <Button className="bg-slate-300 hover:bg-sky-700 ">
-          <Trash2 />
-        </Button>
+      <div className="flex gap-5 justify-center ">
+        <EditarClasse id={row.original.id}></EditarClasse>
 
+        <DialogDeletarClasse classeId={row.original.id}/>
       </div>
     ),
   },
- 
-]
+];
 
-export function DataTableClasse() {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+interface PropsClasse {
+  classes: ClassesArray;
+}
+
+export function DataTableClasse({ classes }: PropsClasse) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
+  );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data,
+    data: classes ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -139,7 +168,7 @@ export function DataTableClasse() {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
     <div className="w-full">
@@ -153,7 +182,6 @@ export function DataTableClasse() {
           className="max-w-sm"
         />
         <DropdownMenu>
-    
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
@@ -170,7 +198,7 @@ export function DataTableClasse() {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -190,7 +218,7 @@ export function DataTableClasse() {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -250,5 +278,5 @@ export function DataTableClasse() {
         </div>
       </div>
     </div>
-  )
+  );
 }

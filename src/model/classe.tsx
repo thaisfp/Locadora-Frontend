@@ -1,14 +1,14 @@
 export interface Classe{
     id: string;
     nome: string;
+    valor: number;
     dataDevolucao: Date;
-    classe: string;
 }
 
 export interface ClasseCreate{
     nome: string;
+    valor: number;
     dataDevolucao: Date;
-    classe: string;
 }
 
 export interface ClasseUpdate{
