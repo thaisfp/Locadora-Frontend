@@ -16,7 +16,12 @@ import { Classe } from "@/model/classe";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { UserPen } from "lucide-react";
 import { useState } from "react";
 
@@ -30,18 +35,34 @@ export function FormNovaClasse({ classe }: PropsClasse) {
 
   const formSchema = z.object({
     nome: z.string().min(1, { message: "Nome da Classe é obrigatório!" }),
-    valor: z.number().min(0, { message: "Valor deve ser maior que zero!" }),
-    dataDevolucao: z.date({ message: "Data de Devolução é obrigatória!" }),
+    valor: z.coerce
+      .number({
+        invalid_type_error: "Valor é obrigatório",
+      })
+      .min(1, { message: "Valor deve ser maior que 0" }),
+
+    dataDevolucao: z.coerce.date({
+        errorMap: ({ code }, { defaultError }) => {
+          if (code === "invalid_date") return { message: "Data é obrigatória" };
+          return { message: defaultError };
+        },
+      })
+      .refine(
+        (data) => {
+          return data > new Date();
+        },
+        { message: "Data de devolução deve ser maior que a atual" }
+      ),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: classe
       ? {
-        nome: classe.nome || "",
-        valor: typeof classe.valor === 'number' ? classe.valor : 0, 
-        dataDevolucao: classe.dataDevolucao ? new Date(classe.dataDevolucao) : new Date(),
-      }
+          nome: classe.nome || "",
+          valor: 0 || classe.valor,
+          dataDevolucao: classe.dataDevolucao ? new Date(classe.dataDevolucao) : new Date() ,
+        }
       : {},
   });
 
@@ -106,6 +127,8 @@ export function FormNovaClasse({ classe }: PropsClasse) {
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
+        <DialogTitle></DialogTitle>
+        <p id="dialog-description"></p>
         <div className="grid gap-4 py-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -145,27 +168,27 @@ export function FormNovaClasse({ classe }: PropsClasse) {
                     )}
                   />
                   <FormField
-                  control={form.control}
-                  name="dataDevolucao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Data do Cadastro</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          className="border border-[#A7A7A7]"
-                          {...field}
-                          value={
-                            field.value instanceof Date
-                              ? field.value.toISOString().split("T")[0]
-                              : field.value
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    control={form.control}
+                    name="dataDevolucao"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Data de Devolução</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            className="border border-[#A7A7A7]"
+                            {...field}
+                            value={
+                              field.value instanceof Date
+                                ? field.value.toISOString().split("T")[0]
+                                : field.value
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
               <div className="flex w-full items-center justify-center gap-5">

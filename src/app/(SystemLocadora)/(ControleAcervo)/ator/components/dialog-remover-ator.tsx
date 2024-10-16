@@ -46,7 +46,7 @@ export function DialogDeletarAtor({ atorId }: IdAtorProps) {
     <>
       <AlertDialog>
         <AlertDialogTrigger>
-          <Button className="bg-slate-300 hover:bg-sky-700 ">
+          <Button className="bg-slate-300 hover:bg-sky-700 shadow-lg">
             <Trash2 />
           </Button>
         </AlertDialogTrigger>

@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUpDown, Trash2 } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Ator, AtoresArray } from "@/model/ator";
 import EditarAtor from "../editarAtor/[id]/page";
 import { DialogDeletarAtor } from "./dialog-remover-ator";

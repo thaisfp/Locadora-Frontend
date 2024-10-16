@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export const useClasseHook = () => {
     const [classe, setClasse] = useState<Classe | null>(null);
-    const [classes, setClassees] = useState<ClassesArray | null>(null);
+    const [classes, setClasses] = useState<ClassesArray | null>(null);
 
     const criarClasse = async (classe: ClasseCreate): Promise<Classe> => {
         const response = await api.post('classe/criar', classe);
@@ -24,7 +24,7 @@ export const useClasseHook = () => {
     const listarClasses = async () => {
         const response = await api.get(`classe/listar`);
         if (response.data) {
-            setClasse(response.data);
+            setClasses(response.data);
         }
     }
 

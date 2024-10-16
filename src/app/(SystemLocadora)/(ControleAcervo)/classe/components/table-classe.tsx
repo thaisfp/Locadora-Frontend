@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUpDown, Trash2 } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Classe, ClassesArray } from "@/model/classe";
 import EditarClasse from "../editarClasse/[id]/page";
 import { DialogDeletarClasse } from "./dialog-remover-classe";
@@ -115,9 +115,16 @@ export const columns: ColumnDef<Classe>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div className="pl-3 flex justify-center ">{row.getValue("dataDevolucao")}</div>
-    ),
+    cell: ({ row }) => {
+      const data = new Date(row.original.dataDevolucao);
+      return (
+          <div className="capitalize pl-3 flex justify-center " >
+              {data.toLocaleDateString('pt-BR', {
+                  timeZone: 'UTC',
+              })}
+          </div >
+      );
+  },
   },
   {
     accessorKey: "acoes",

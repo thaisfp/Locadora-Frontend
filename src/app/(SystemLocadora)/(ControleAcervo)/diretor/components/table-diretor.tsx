@@ -31,7 +31,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DiretoresArray } from "@/model/diretor";
-import { DialogDeletarDiretor } from "./dialog-form-diretor";
+import { DialogDeletarDiretor } from "./dialog-remover-diretor";
 import EditarDiretor from "../editarDiretor/[id]/page";
 
 export type Payment = {

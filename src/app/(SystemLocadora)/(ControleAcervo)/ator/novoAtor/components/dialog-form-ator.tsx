@@ -69,7 +69,6 @@ export function FormNovoAtor({ ator }: PropsAtor) {
       }
 
       setIsOpen(false);
-
     } catch {
       toast({
         title: "Erro!",
