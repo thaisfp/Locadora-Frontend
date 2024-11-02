@@ -29,7 +29,7 @@ export function FormNovoDiretor({ diretor }: PropsDiretor) {
     const [isOpen, setIsOpen] = useState(false);
 
     const formSchema = z.object({
-        nome: z.string().min(1, { message: "Nome do Diretor é obrigatório!" }),
+        nome: z.string({required_error: "Nome do Diretor é obrigatório!"}).min(2, { message: "Número insuficiente de caracteres" }),
     });
 
     const form = useForm<z.infer<typeof formSchema>>({

@@ -34,7 +34,7 @@ export function FormNovaClasse({ classe }: PropsClasse) {
   const [isOpen, setIsOpen] = useState(false);
 
   const formSchema = z.object({
-    nome: z.string().min(1, { message: "Nome da Classe é obrigatório!" }),
+    nome: z.string({required_error: "Nome da Classe é obrigatório!"}).min(2, { message: "Número insuficiente de caracteres" }),
     valor: z.coerce
       .number({
         invalid_type_error: "Valor é obrigatório",

@@ -9,7 +9,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <div className="flex flex-col h-screen">
-          <div className="flex shadow-md p-5 items-center justify-center">
+          <div className="flex shadow-md p-5 items-center justify-center ">
             <NavigationMenuHome />
           </div>
 

@@ -15,12 +15,12 @@ import {
 export function NavigationMenuHome() {
   return (
     <>
-      <NavigationMenu>
+      <NavigationMenu >
         <NavigationMenuList>
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Acervo</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className=" flex flex-col justify-between p-6 w-[100px]  lg:h-[150px]  items-center">
+            <NavigationMenuTrigger >Acervo</NavigationMenuTrigger>
+            <NavigationMenuContent >
+              <ul className=" flex flex-col justify-between p-6 w-[100px]  lg:h-[150px]  items-center ">
                 <li className="hover:bg-accent w-full h-[30px] flex items-center justify-center rounded-sm">
                   <a
                     className="flex text-sm leading-tight text-muted-foreground"
@@ -59,7 +59,7 @@ export function NavigationMenuHome() {
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Atendimento a Cliente</NavigationMenuTrigger>
+            <NavigationMenuTrigger >Atendimento a Cliente</NavigationMenuTrigger>
             {/* <NavigationMenuContent>
               <ul className=" flex flex-col justify-between p-6 lg:w-[190px]  lg:h-[150px]  items-center ">
                 <li className="hover:bg-accent w-full h-[30px] flex items-center justify-center rounded-sm">
