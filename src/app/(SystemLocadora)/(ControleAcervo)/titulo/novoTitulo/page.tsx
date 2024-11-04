@@ -1,6 +1,6 @@
 "use client"
 
-import { FormNovoTitulo } from "./components/dialig-form-titulo"
+import { FormNovoTitulo } from "./components/dialog-form-titulo"
 
 export default function NovoTitulo () {
 

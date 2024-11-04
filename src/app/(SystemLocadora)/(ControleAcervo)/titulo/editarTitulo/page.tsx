@@ -3,7 +3,7 @@
 import { useTituloHook } from "@/hooks/titulo"; 
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
-import { FormNovoTitulo } from "../novoTitulo/components/dialig-form-titulo";
+import { FormNovoTitulo } from "../novoTitulo/components/dialog-form-titulo";
 
 interface EditarTituloProps {
   id: string;

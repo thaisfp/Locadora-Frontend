@@ -3,7 +3,7 @@
 import { useTituloHook } from "@/hooks/titulo"; 
 import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FormNovoTitulo } from "./novoTitulo/components/dialig-form-titulo";
+import { FormNovoTitulo } from "./novoTitulo/components/dialog-form-titulo";
 import { DataTableTitulo } from "./components/table-titulo";
 
 export default function Titulo() {

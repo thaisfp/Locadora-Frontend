@@ -27,6 +27,8 @@ import {
 import { UserPen } from "lucide-react";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 interface PropsTitulo {
     titulo?: Titulo;
@@ -64,7 +66,7 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
         resolver: zodResolver(formSchema),
         defaultValues: titulo ? {
             nome: titulo.nome || "",
-            ator: titulo.ator.id || "",
+            ator: "",
             diretor: titulo.diretor.id || "",
             ano: titulo.ano || new Date().getFullYear(),
             sinopse: titulo.sinopse || "",
@@ -88,7 +90,7 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                     id: titulo.id,
                     nome: values.nome,
                     ator: { id: values.ator },
-                    diretor:  { id: values.diretor },
+                    diretor: { id: values.diretor },
                     ano: values.ano,
                     sinopse: values.sinopse,
                     categoria: values.categoria,
@@ -155,7 +157,7 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                                 name="ator"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Ator</FormLabel>
+                                        <FormLabel>Classe</FormLabel>
                                         <Select onValueChange={field.onChange} {...field}>
                                             <FormControl>
                                                 <SelectTrigger className="w-full border border-[#A7A7A7]">
@@ -165,16 +167,49 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                                             <SelectContent>
                                                 {atores && atores.length > 0 ? (
                                                     atores.map((ator) => (
-                                                        <SelectItem key={ator.id} value={ator.id}>
-                                                            {ator.nome}
+                                                        <div key={ator.id} className="flex items-center space-x-2">
+                                                            <Checkbox id={`checkbox-${ator.id}`}>
+                                                            </Checkbox>
+                                                            <label htmlFor={`checkbox-${ator.id}`}>{ator.nome}</label>
+
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div >
+                                                        Sem atores cadastrados
+                                                    </div>
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="classe"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Classe</FormLabel>
+                                        <Select onValueChange={field.onChange} {...field}>
+                                            <FormControl>
+                                                <SelectTrigger className="w-full border border-[#A7A7A7]">
+                                                    <SelectValue placeholder="Selecione a modalidade"></SelectValue>
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {classes && classes.length > 0 ? (
+                                                    classes.map((classe) => (
+                                                        <SelectItem key={classe.id} value={classe.id}>
+                                                            {classe.nome}
                                                         </SelectItem>
                                                     ))
                                                 ) : (
                                                     <SelectItem disabled value="sem-atores">
-                                                        Sem atores cadastrados
+                                                        Sem classes cadastradas
                                                     </SelectItem>
-                                                )
-                                                }
+                                                )}
 
                                             </SelectContent>
                                         </Select>
@@ -182,39 +217,6 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                                     </FormItem>
                                 )}
                             />
-                            
-                            {/* Seletor de Diretores
-                            <FormField control={form.control} name="diretor" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Diretor</FormLabel>
-                                    <FormControl>
-                                        <Select.Root onValueChange={field.onChange} value={field.value}>
-                                            <Select.Trigger className="w-full p-1 border rounded-md bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-700 transition duration-150 ease-in-out">
-                                                <Select.Value placeholder="Selecione um diretor" />
-                                                <Select.Icon>
-                                                    <span className="text-gray-500">▼</span>
-                                                </Select.Icon>
-                                            </Select.Trigger>
-                                            <Select.Content className="bg-white border border-gray-300 rounded-md shadow-lg">
-                                                <Select.ScrollUpButton className="flex items-center justify-center h-8 cursor-default bg-gray-100 hover:bg-gray-200">
-                                                    ↑
-                                                </Select.ScrollUpButton>
-                                                <Select.Viewport>
-                                                    {(diretores ?? []).map((diretor) => (
-                                                        <Select.Item key={diretor.id} value={diretor.nome} className="cursor-pointer p-2 hover:bg-gray-200">
-                                                            <Select.ItemText>{diretor.nome}</Select.ItemText>
-                                                        </Select.Item>
-                                                    ))}
-                                                </Select.Viewport>
-                                                <Select.ScrollDownButton className="flex items-center justify-center h-8 cursor-default bg-gray-100 hover:bg-gray-200">
-                                                    ↓
-                                                </Select.ScrollDownButton>
-                                            </Select.Content>
-                                        </Select.Root>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )} /> */}
 
                             <FormField control={form.control} name="ano" render={({ field }) => (
                                 <FormItem>
