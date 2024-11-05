@@ -1,7 +1,7 @@
 import { Titulo, TituloCreate, TituloUpdate, TitulosArray } from "@/model/titulo";
-import { AtoresArray} from "@/model/ator";
-import { DiretoresArray} from "@/model/diretor";
-import { ClassesArray} from "@/model/classe";
+import { AtoresArray } from "@/model/ator";
+import { DiretoresArray } from "@/model/diretor";
+import { ClassesArray } from "@/model/classe";
 import api from "@/server/server";
 import { useState } from "react";
 
@@ -17,46 +17,44 @@ export const useTituloHook = () => {
         return response.data;
     };
 
-    const editarTitulo = async (tituloData: TituloUpdate): Promise<TituloUpdate> => {
+    const editarTitulo = async (tituloData: TituloUpdate): Promise<Titulo> => {
         const response = await api.put(`titulo/editar/${tituloData.id}`, tituloData);
         return response.data;
-    }
+    };
 
     const deletarTitulo = async (tituloId: string): Promise<void> => {
-        const response = await api.delete(`titulo/deletar/${tituloId}`);
-        return response.data;
-    }
+        await api.delete(`titulo/deletar/${tituloId}`);
+    };
 
-    const listarTitulos = async () => {
+    const listarTitulos = async (): Promise<void> => {
         const response = await api.get('titulo/listar');
         if (response.data) {
             setTitulos(response.data);
         }
-    }
+    };
 
-    const selecionarTitulo = async (tituloId: string) => {
+    const selecionarTitulo = async (tituloId: string): Promise<void> => {
         const response = await api.get(`titulo/listar/${tituloId}`);
         if (response.data) {
             setTitulo(response.data);
         }
-    }
+    };
 
-
-    const listarAtores = async () => {
+    const listarAtores = async (): Promise<void> => {
         const response = await api.get('ator/listar'); 
         if (response.data) {
             setAtores(response.data);
         }
     };
 
-    const listarDiretores = async () => {
+    const listarDiretores = async (): Promise<void> => {
         const response = await api.get('diretor/listar'); 
         if (response.data) {
             setDiretores(response.data);
         }
     };
 
-    const listarClasses = async () => {
+    const listarClasses = async (): Promise<void> => {
         const response = await api.get('classe/listar'); 
         if (response.data) {
             setClasses(response.data);

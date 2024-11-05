@@ -75,12 +75,18 @@ export const columns: ColumnDef<Titulo>[] = [
   {
     accessorKey: "atores",
     header: "Atores",
-    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.original.ator.nome}</div>,
+    cell: ({ row }) => (<div className="pl-3 flex justify-center">
+        {row.original.atores?.length ? row.original.atores.map(ator => ator.nome).join(", ") : "Ator(es) não disponível"}
+      </div>
+    ),
   },
   {
     accessorKey: "diretor",
     header: "Diretor",
-    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.original.diretor.id}</div>,
+    cell: ({ row }) => (<div className="pl-3 flex justify-center">
+        {row.original.diretor ? row.original.diretor.nome : "Diretor não disponível"}
+      </div>
+    ),
   },
   {
     accessorKey: "ano",
@@ -100,7 +106,10 @@ export const columns: ColumnDef<Titulo>[] = [
   {
     accessorKey: "classe",
     header: "Classe",
-    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.original.classe.nome}</div>,
+    cell: ({ row }) => 
+    <div className="pl-3 flex justify-center">
+      {row.original.classe ? row.original.classe.nome : "Classe não disponível"}
+      </div>,
   },
   {
     accessorKey: "acoes",

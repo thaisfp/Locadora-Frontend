@@ -5,7 +5,7 @@ import { Diretor } from "./diretor";
 export interface Titulo {
     id: string;
     nome: string;
-    ator: Ator[];
+    atores: Ator[];
     diretor: Diretor;
     ano: number;
     sinopse: string;
@@ -15,7 +15,7 @@ export interface Titulo {
   
   export interface TituloCreate {
     nome: string;
-    ator: {id: string};
+    atores: {id: string}[];
     diretor: {id: string};
     ano: number;
     sinopse: string;
