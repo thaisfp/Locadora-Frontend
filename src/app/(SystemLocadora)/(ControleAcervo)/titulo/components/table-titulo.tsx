@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import * as React from "react";
 import {
@@ -32,8 +32,22 @@ import {
 } from "@/components/ui/table";
 import { ArrowUpDown } from "lucide-react";
 import { DialogDeletarTitulo } from "./dialog-remover-titulo";
-import EditarTitulo from "../editarTitulo/page";
 import { Titulo, TitulosArray } from "@/model/titulo";
+import EditarTitulo from "../editarTituloo/[id]/page";
+import { Ator } from "@/model/ator";
+import { Classe } from "@/model/classe";
+import { Diretor } from "@/model/diretor";
+
+export type Payment = {
+  id: string;
+  nome: string;
+  atores: Array<Ator>;
+  diretor: Diretor;
+  ano: number;
+  sinopse: string;
+  categoria: string;
+  classe: Classe;
+};
 
 export const columns: ColumnDef<Titulo>[] = [
   {
@@ -76,7 +90,7 @@ export const columns: ColumnDef<Titulo>[] = [
     accessorKey: "atores",
     header: "Atores",
     cell: ({ row }) => (<div className="pl-3 flex justify-center">
-        {row.original.atores?.length ? row.original.atores.map(ator => ator.nome).join(", ") : "Ator(es) não disponível"}
+        {row.original.atores?.length > 0 ? row.original.atores.map(ator => ator.nome).join(", ") : "Ator(es) não disponível"}
       </div>
     ),
   },
@@ -113,11 +127,18 @@ export const columns: ColumnDef<Titulo>[] = [
   },
   {
     accessorKey: "acoes",
-    header: "Ações",
+    header: ({}) => {
+      return (
+        <Button variant="ghost" className="w-full">
+          Ações
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div className="flex gap-5 justify-center">
-        <EditarTitulo id={row.original.id} />
-        <DialogDeletarTitulo tituloId={row.original.id} />
+      <div className="flex gap-5 justify-center ">
+        <EditarTitulo id={row.original.id}></EditarTitulo>
+
+        <DialogDeletarTitulo tituloId={row.original.id}/>
       </div>
     ),
   },

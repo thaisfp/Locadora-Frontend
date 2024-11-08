@@ -33,7 +33,7 @@ export const useTituloHook = () => {
         }
     };
 
-    const selecionarTitulo = async (tituloId: string): Promise<void> => {
+    const selecionarTitulo = async (tituloId: string) => {
         const response = await api.get(`titulo/listar/${tituloId}`);
         if (response.data) {
             setTitulo(response.data);

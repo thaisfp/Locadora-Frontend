@@ -5,7 +5,7 @@ import { Diretor } from "./diretor";
 export interface Titulo {
     id: string;
     nome: string;
-    atores: Ator[];
+    atores: Array<Ator>;
     diretor: Diretor;
     ano: number;
     sinopse: string;
@@ -15,7 +15,7 @@ export interface Titulo {
   
   export interface TituloCreate {
     nome: string;
-    atores: {id: string}[];
+    atores: Ator[];
     diretor: {id: string};
     ano: number;
     sinopse: string;
@@ -28,4 +28,4 @@ export interface Titulo {
     
   }
   
-  export interface TitulosArray extends Array<Titulo> { }
+  export type TitulosArray = Array<Titulo>

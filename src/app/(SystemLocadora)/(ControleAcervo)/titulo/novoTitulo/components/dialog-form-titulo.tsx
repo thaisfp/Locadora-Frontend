@@ -22,35 +22,37 @@ import { z } from "zod";
 import {
     Dialog,
     DialogContent,
-    DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { UserPen } from "lucide-react";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 
 interface PropsTitulo {
     titulo?: Titulo;
 }
 
 export function FormNovoTitulo({ titulo }: PropsTitulo) {
-    const { criarTitulo, editarTitulo, listarTitulos } = useTituloHook();
+    const { criarTitulo, editarTitulo } = useTituloHook();
     const { listarAtores, atores } = useAtorHook();
     const { listarDiretores, diretores } = useDiretorHook();
     const { listarClasses, classes } = useClasseHook();
     const [selectedAtores, setSelectedAtores] = useState<Ator[]>([]);
     const [isOpen, setIsOpen] = useState(false);
 
-    useEffect(() => {
-        if (isOpen) {
-            listarAtores();
-            listarDiretores();
-            listarClasses();
-        }
-    }, [isOpen]);
 
+    useEffect(() => {
+        const fetchData = async () => {
+          await listarAtores(); 
+          await listarClasses();
+          await listarDiretores();
+        };
+    
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    
     const formSchema = z.object({
         nome: z.string({ required_error: "Nome do Título é obrigatório!" })
             .min(2, { message: "Número insuficiente de caracteres" }),
@@ -70,7 +72,7 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
             nome: titulo.nome || "",
             atores: titulo.atores?.map((ator) => ator.id) || [],
             diretor: titulo.diretor.id || "",
-            ano: Number(titulo?.ano) || new Date().getFullYear(),
+            ano: titulo?.ano || new Date().getFullYear(),
             sinopse: titulo.sinopse || "",
             categoria: titulo.categoria || "",
             classe: titulo.classe.id || "",
@@ -87,11 +89,17 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
+            const atoresSelecionados = values.atores.map(id => {
+                const atorEncontrado = atores!.find(ator => ator.id === id);
+                if (!atorEncontrado) throw new Error(`Ator com ID ${id} não encontrado.`);
+                return atorEncontrado;
+            });
+
             if (titulo) {
                 const editTitulo = {
                     id: titulo.id,
                     nome: values.nome,
-                    atores: values.atores.map((id) => ({ id })),
+                    atores: atoresSelecionados,
                     diretor: { id: values.diretor },
                     ano: values.ano,
                     sinopse: values.sinopse,
@@ -104,7 +112,7 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
             } else {
                 const novoTitulo = {
                     nome: values.nome,
-                    atores: values.atores.map((id) => ({ id })),
+                    atores: atoresSelecionados,
                     diretor: { id: values.diretor },
                     ano: values.ano,
                     sinopse: values.sinopse,
@@ -112,6 +120,8 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                     classe: { id: values.classe },
                 };
 
+                console.log("TITULO === ", novoTitulo);
+                
                 await criarTitulo(novoTitulo);
                 toast({ title: "Sucesso!", description: "Título criado com sucesso" });
             }
