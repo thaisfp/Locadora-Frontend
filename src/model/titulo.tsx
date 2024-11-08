@@ -3,9 +3,9 @@ import { Classe } from "./classe";
 import { Diretor } from "./diretor";
 
 export interface Titulo {
-    id: string;
+    idTitulo: string;
     nome: string;
-    ator: Ator[];
+    atores: Array<Ator>;
     diretor: Diretor;
     ano: number;
     sinopse: string;
@@ -15,7 +15,7 @@ export interface Titulo {
   
   export interface TituloCreate {
     nome: string;
-    ator: {id: string};
+    atores: Ator[];
     diretor: {id: string};
     ano: number;
     sinopse: string;
@@ -24,8 +24,8 @@ export interface Titulo {
   }
   
   export interface TituloUpdate extends TituloCreate{
-    id: string;
+    idTitulo: string;
     
   }
   
-  export interface TitulosArray extends Array<Titulo> { }
+  export type TitulosArray = Array<Titulo>

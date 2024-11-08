@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import * as React from "react";
 import {
@@ -32,8 +32,22 @@ import {
 } from "@/components/ui/table";
 import { ArrowUpDown } from "lucide-react";
 import { DialogDeletarTitulo } from "./dialog-remover-titulo";
-import EditarTitulo from "../editarTitulo/page";
 import { Titulo, TitulosArray } from "@/model/titulo";
+import { Ator } from "@/model/ator";
+import { Classe } from "@/model/classe";
+import { Diretor } from "@/model/diretor";
+import EditarTitulo from "../editarTituloo/[id]/page";
+
+export type Payment = {
+  id: string;
+  nome: string;
+  atores: Array<Ator>;
+  diretor: Diretor;
+  ano: number;
+  sinopse: string;
+  categoria: string;
+  classe: Classe;
+};
 
 export const columns: ColumnDef<Titulo>[] = [
   {
@@ -75,12 +89,18 @@ export const columns: ColumnDef<Titulo>[] = [
   {
     accessorKey: "atores",
     header: "Atores",
-    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.original.ator.nome}</div>,
+    cell: ({ row }) => (<div className="pl-3 flex justify-center">
+        {row.original.atores?.length > 0 ? row.original.atores.map(ator => ator.nome).join(", ") : "Ator(es) não disponível"}
+      </div>
+    ),
   },
   {
     accessorKey: "diretor",
     header: "Diretor",
-    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.original.diretor.id}</div>,
+    cell: ({ row }) => (<div className="pl-3 flex justify-center">
+        {row.original.diretor ? row.original.diretor.nome : "Diretor não disponível"}
+      </div>
+    ),
   },
   {
     accessorKey: "ano",
@@ -100,15 +120,25 @@ export const columns: ColumnDef<Titulo>[] = [
   {
     accessorKey: "classe",
     header: "Classe",
-    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.original.classe.nome}</div>,
+    cell: ({ row }) => 
+    <div className="pl-3 flex justify-center">
+      {row.original.classe ? row.original.classe.nome : "Classe não disponível"}
+      </div>,
   },
   {
     accessorKey: "acoes",
-    header: "Ações",
+    header: ({}) => {
+      return (
+        <Button variant="ghost" className="w-full">
+          Ações
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div className="flex gap-5 justify-center">
-        <EditarTitulo id={row.original.id} />
-        <DialogDeletarTitulo tituloId={row.original.id} />
+      <div className="flex gap-5 justify-center ">
+        <EditarTitulo tituloObj={row.original}></EditarTitulo>
+
+        <DialogDeletarTitulo tituloId={row.original.idTitulo}/>
       </div>
     ),
   },

@@ -15,44 +15,48 @@ import { useDiretorHook } from "@/hooks/diretor";
 import { useClasseHook } from "@/hooks/classe";
 import { toast } from "@/components/ui/use-toast";
 import { Titulo } from "@/model/titulo";
+import { Ator } from "@/model/ator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
     Dialog,
     DialogContent,
-    DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { UserPen } from "lucide-react";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 
 interface PropsTitulo {
     titulo?: Titulo;
 }
 
 export function FormNovoTitulo({ titulo }: PropsTitulo) {
-    const { criarTitulo, editarTitulo, listarTitulos } = useTituloHook();
+    const { criarTitulo, editarTitulo } = useTituloHook();
     const { listarAtores, atores } = useAtorHook();
     const { listarDiretores, diretores } = useDiretorHook();
     const { listarClasses, classes } = useClasseHook();
+    const [selectedAtores, setSelectedAtores] = useState<Ator[]>([]);
     const [isOpen, setIsOpen] = useState(false);
 
-    useEffect(() => {
-        if (isOpen) {
-            listarAtores();
-            listarDiretores();
-            listarClasses();
-        }
-    }, [isOpen]);
 
+    useEffect(() => {
+        const fetchData = async () => {
+          await listarAtores(); 
+          await listarClasses();
+          await listarDiretores();
+        };
+    
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    
     const formSchema = z.object({
         nome: z.string({ required_error: "Nome do Título é obrigatório!" })
             .min(2, { message: "Número insuficiente de caracteres" }),
-        ator: z.string({ required_error: "Ator é obrigatório!" }),
+        atores: z.array(z.string()).nonempty({ message: "Selecione pelo menos um ator!" }),
         diretor: z.string({ required_error: "Diretor é obrigatório!" }),
         ano: z.number({ invalid_type_error: "Ano é obrigatório" })
             .min(1900, { message: "Ano deve ser maior que 1900" }),
@@ -66,15 +70,15 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
         resolver: zodResolver(formSchema),
         defaultValues: titulo ? {
             nome: titulo.nome || "",
-            ator: "",
+            atores: titulo.atores?.map((ator) => ator.id) || [],
             diretor: titulo.diretor.id || "",
-            ano: titulo.ano || new Date().getFullYear(),
+            ano: titulo?.ano || new Date().getFullYear(),
             sinopse: titulo.sinopse || "",
             categoria: titulo.categoria || "",
             classe: titulo.classe.id || "",
         } : {
             nome: "",
-            ator: "",
+            atores: [],
             diretor: "",
             ano: new Date().getFullYear(),
             sinopse: "",
@@ -85,11 +89,18 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
+            const atoresSelecionados = values.atores.map(id => {
+                const atorEncontrado = atores!.find(ator => ator.id === id);
+                if (!atorEncontrado) throw new Error(`Ator com ID ${id} não encontrado.`);
+                return atorEncontrado;
+            });
+
             if (titulo) {
+                console.log("IF ===== ", titulo)
                 const editTitulo = {
-                    id: titulo.id,
+                    idTitulo: titulo?.idTitulo,
                     nome: values.nome,
-                    ator: { id: values.ator },
+                    atores: atoresSelecionados,
                     diretor: { id: values.diretor },
                     ano: values.ano,
                     sinopse: values.sinopse,
@@ -97,12 +108,20 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                     classe: { id: values.classe },
                 };
 
-                await editarTitulo(editTitulo);
-                toast({ title: "Sucesso!", description: "Título editado com sucesso" });
+                console.log("TITULO === ", editTitulo);
+
+                await editarTitulo(editTitulo).then((res)=>{
+                    console.log(res)
+
+                    toast({ title: "Sucesso!", description: "Título editado com sucesso" });
+                    window.location.reload();
+                })
+
+            
             } else {
                 const novoTitulo = {
                     nome: values.nome,
-                    ator: { id: values.ator },
+                    atores: atoresSelecionados,
                     diretor: { id: values.diretor },
                     ano: values.ano,
                     sinopse: values.sinopse,
@@ -110,6 +129,8 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                     classe: { id: values.classe },
                 };
 
+                console.log("TITULO === ", novoTitulo);
+                
                 await criarTitulo(novoTitulo);
                 toast({ title: "Sucesso!", description: "Título criado com sucesso" });
             }
@@ -154,22 +175,37 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
 
                             <FormField
                                 control={form.control}
-                                name="ator"
+                                name="atores"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Classe</FormLabel>
-                                        <Select onValueChange={field.onChange} {...field}>
+                                        <FormLabel>Ator(es)</FormLabel>
+                                        <Select onValueChange={value => {
+                                            const newValue = field.value.includes(value)
+                                                ? field.value.filter((v) => v !== value)
+                                                : [...field.value, value];
+                                            field.onChange(newValue);
+                                            setSelectedAtores(atores ? atores.filter(ator => newValue.includes(ator.id)) : []);
+                                        }}>
                                             <FormControl>
                                                 <SelectTrigger className="w-full border border-[#A7A7A7]">
-                                                    <SelectValue placeholder="Selecione a modalidade"></SelectValue>
+                                                    <SelectValue placeholder={selectedAtores.length > 0 ?
+                                                        (selectedAtores.length === 1 ? selectedAtores[0].nome : `${selectedAtores[0].nome}, ...`)
+                                                        : "Selecione os atores"} />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
                                                 {atores && atores.length > 0 ? (
                                                     atores.map((ator) => (
                                                         <div key={ator.id} className="flex items-center space-x-2">
-                                                            <Checkbox id={`checkbox-${ator.id}`}>
-                                                            </Checkbox>
+                                                            <Checkbox id={`checkbox-${ator.id}`}
+                                                                checked={field.value.includes(ator.id)}
+                                                                onCheckedChange={() => {
+                                                                    const newValue = field.value.includes(ator.id)
+                                                                        ? field.value.filter(id => id !== ator.id)
+                                                                        : [...field.value, ator.id];
+                                                                    field.onChange(newValue);
+                                                                    setSelectedAtores(atores.filter(ator => newValue.includes(ator.id)));
+                                                                }} />
                                                             <label htmlFor={`checkbox-${ator.id}`}>{ator.nome}</label>
 
                                                         </div>
@@ -179,6 +215,38 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                                                         Sem atores cadastrados
                                                     </div>
                                                 )}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="diretor"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Diretor</FormLabel>
+                                        <Select onValueChange={field.onChange} {...field}>
+                                            <FormControl>
+                                                <SelectTrigger className="w-full border border-[#A7A7A7]">
+                                                    <SelectValue placeholder="Selecione a modalidade"></SelectValue>
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {diretores && diretores.length > 0 ? (
+                                                    diretores.map((diretor) => (
+                                                        <SelectItem key={diretor.id} value={diretor.id}>
+                                                            {diretor.nome}
+                                                        </SelectItem>
+                                                    ))
+                                                ) : (
+                                                    <SelectItem disabled value="sem-atores">
+                                                        Sem diretores cadastradas
+                                                    </SelectItem>
+                                                )}
+
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -248,39 +316,6 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                                     <FormMessage />
                                 </FormItem>
                             )} />
-
-                            {/* Seletor de Classes
-                            <FormField control={form.control} name="classe" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Classe</FormLabel>
-                                    <FormControl>
-                                        <Select.Root onValueChange={field.onChange} value={field.value}>
-                                            <Select.Trigger className="w-full p-1 border rounded-md bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-700 transition duration-150 ease-in-out">
-                                                <Select.Value placeholder="Selecione uma classe" />
-                                                <Select.Icon>
-                                                    <span className="text-gray-500">▼</span>
-                                                </Select.Icon>
-                                            </Select.Trigger>
-                                            <Select.Content className="bg-white border border-gray-300 rounded-md shadow-lg">
-                                                <Select.ScrollUpButton className="flex items-center justify-center h-8 cursor-default bg-gray-100 hover:bg-gray-200">
-                                                    ↑
-                                                </Select.ScrollUpButton>
-                                                <Select.Viewport>
-                                                    {(classes ?? []).map((classe) => (
-                                                        <Select.Item key={classe.id} value={classe.nome} className="cursor-pointer p-2 hover:bg-gray-200">
-                                                            <Select.ItemText>{classe.nome}</Select.ItemText>
-                                                        </Select.Item>
-                                                    ))}
-                                                </Select.Viewport>
-                                                <Select.ScrollDownButton className="flex items-center justify-center h-8 cursor-default bg-gray-100 hover:bg-gray-200">
-                                                    ↓
-                                                </Select.ScrollDownButton>
-                                            </Select.Content>
-                                        </Select.Root>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )} /> */}
 
                             <div className="flex w-full items-center justify-center gap-5">
                                 <Button
