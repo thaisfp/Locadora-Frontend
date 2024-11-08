@@ -33,10 +33,10 @@ import {
 import { ArrowUpDown } from "lucide-react";
 import { DialogDeletarTitulo } from "./dialog-remover-titulo";
 import { Titulo, TitulosArray } from "@/model/titulo";
-import EditarTitulo from "../editarTituloo/[id]/page";
 import { Ator } from "@/model/ator";
 import { Classe } from "@/model/classe";
 import { Diretor } from "@/model/diretor";
+import EditarTitulo from "../editarTituloo/[id]/page";
 
 export type Payment = {
   id: string;
@@ -136,7 +136,7 @@ export const columns: ColumnDef<Titulo>[] = [
     },
     cell: ({ row }) => (
       <div className="flex gap-5 justify-center ">
-        <EditarTitulo id={row.original.id}></EditarTitulo>
+        <EditarTitulo tituloObj={row.original}></EditarTitulo>
 
         <DialogDeletarTitulo tituloId={row.original.id}/>
       </div>

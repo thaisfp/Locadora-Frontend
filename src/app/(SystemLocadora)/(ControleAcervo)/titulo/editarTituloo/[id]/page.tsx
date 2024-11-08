@@ -1,27 +1,22 @@
 "use client";
 
-import { useTituloHook } from "@/hooks/titulo";
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
 import { FormNovoTitulo } from "../../novoTitulo/components/dialog-form-titulo";
+import { Titulo } from "@/model/titulo";
 
 interface EditarTituloProps {
-    id: string;
+    tituloObj: Titulo;
   }
   
-  export default function EditarClasse({ id }: EditarTituloProps) {
-    const { titulo, selecionarTitulo } = useTituloHook();
+  export default function EditarTitulo({ tituloObj }: EditarTituloProps) {
     const [isLoading, setIsLoading] = useState(true);
   
     useEffect(() => {
-      const fetchData = async () => {
-        await selecionarTitulo(id);
         setIsLoading(false);
-      };
   
-      fetchData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
+    }, [tituloObj.id]);
   
     if (isLoading) {
       return (
@@ -34,7 +29,7 @@ interface EditarTituloProps {
   
     return (
       <div>
-        <FormNovoTitulo titulo={titulo!}></FormNovoTitulo>
+        <FormNovoTitulo titulo={tituloObj!}></FormNovoTitulo>
       </div>
     );
   }
