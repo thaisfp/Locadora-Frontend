@@ -138,7 +138,7 @@ export const columns: ColumnDef<Titulo>[] = [
       <div className="flex gap-5 justify-center ">
         <EditarTitulo tituloObj={row.original}></EditarTitulo>
 
-        <DialogDeletarTitulo tituloId={row.original.id}/>
+        <DialogDeletarTitulo tituloId={row.original.idTitulo}/>
       </div>
     ),
   },

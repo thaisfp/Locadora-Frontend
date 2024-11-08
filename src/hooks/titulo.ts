@@ -18,7 +18,7 @@ export const useTituloHook = () => {
     };
 
     const editarTitulo = async (tituloData: TituloUpdate): Promise<Titulo> => {
-        const response = await api.put(`titulo/editar/${tituloData.id}`, tituloData);
+        const response = await api.put(`titulo/editar/${tituloData.idTitulo}`, tituloData);
         return response.data;
     };
 

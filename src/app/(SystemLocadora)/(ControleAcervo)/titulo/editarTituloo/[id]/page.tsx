@@ -16,7 +16,7 @@ interface EditarTituloProps {
         setIsLoading(false);
   
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tituloObj.id]);
+    }, [tituloObj.idTitulo]);
   
     if (isLoading) {
       return (

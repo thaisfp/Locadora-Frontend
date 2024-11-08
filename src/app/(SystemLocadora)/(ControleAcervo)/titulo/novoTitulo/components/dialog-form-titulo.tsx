@@ -96,8 +96,9 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
             });
 
             if (titulo) {
+                console.log("IF ===== ", titulo)
                 const editTitulo = {
-                    id: titulo.id,
+                    idTitulo: titulo?.idTitulo,
                     nome: values.nome,
                     atores: atoresSelecionados,
                     diretor: { id: values.diretor },
@@ -107,8 +108,16 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                     classe: { id: values.classe },
                 };
 
-                await editarTitulo(editTitulo);
-                toast({ title: "Sucesso!", description: "Título editado com sucesso" });
+                console.log("TITULO === ", editTitulo);
+
+                await editarTitulo(editTitulo).then((res)=>{
+                    console.log(res)
+
+                    toast({ title: "Sucesso!", description: "Título editado com sucesso" });
+                    window.location.reload();
+                })
+
+            
             } else {
                 const novoTitulo = {
                     nome: values.nome,
