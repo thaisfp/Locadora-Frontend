@@ -13,10 +13,14 @@ import { Input } from "@/components/ui/input";
 import { useItemHook } from "@/hooks/item";
 import { toast } from "@/components/ui/use-toast";
 import { Item } from "@/model/item";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusCircle } from "lucide-react";
 import { useState } from "react";
+import { useTituloHook } from "@/hooks/titulo";
 
 interface PropsItem {
     item?: Item;
@@ -24,31 +28,30 @@ interface PropsItem {
 
 export function FormNovoItem({ item }: PropsItem) {
     const { criarItem, editarItem } = useItemHook();
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);    
+    const { listarTitulos, titulos } = useTituloHook();
 
-    // Esquema Zod comentado para testar sem validação
-    /* const formSchema = z.object({
-        numSerie: z.string().min(5, { message: "Número de série inválido" }),
-        titulo: z.string().min(2, { message: "Título muito curto" }),
+    const formSchema = z.object({
+        numSerie: z.string({ required_error: "Número de série é obrigatório!" }).min(5, { message: "Número de série inválido" }),
+        titulo: z.string({ required_error: "Título é obrigatório!" }).min(2, { message: "Título muito curto" }),
         dtAquisicao: z.date(),
-        tipoItem: z.enum(["Fita", "DVD", "BlueRay"]),
-    }); */
+        tipoItem: z.enum(["Fita", "DVD", "BlueRay"], { required_error: "Tipo é obrigatório!" }),
+    });
 
-    const form = useForm({
-        // Temporariamente, comentamos o resolver para testar sem validação
-        // resolver: zodResolver(formSchema),
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
         defaultValues: item
             ? {
                 numSerie: item.numSerie || "",
                 titulo: item.titulo.idTitulo || "",
-                dtAquisicao: item.dtAquisicao ? new Date(item.dtAquisicao) : undefined,
+                dtAquisicao: item ? new Date(item.dtAquisicao) : undefined,
                 tipoItem: item.tipoItem || "DVD",
             }
             : {},
     });
 
-    async function onSubmit(values: any) {
-        console.log("Início de onSubmit", values); // Log para ver os valores do formulário
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        console.log("onSubmit chamado com valores:", values);
 
         try {
             if (item) {
@@ -56,12 +59,12 @@ export function FormNovoItem({ item }: PropsItem) {
                     id: item.id,
                     numSerie: values.numSerie,
                     titulo: { idTitulo: values.titulo },
-                    dtAquisicao: values.dtAquisicao,
+                    dtAquisicao: values.dtAquisicao, 
                     tipoItem: values.tipoItem,
                 };
 
+                console.log("Editando item:", editItem);
                 await editarItem(editItem);
-                console.log("Item editado com sucesso");
 
                 toast({
                     title: "Sucesso!",
@@ -75,8 +78,8 @@ export function FormNovoItem({ item }: PropsItem) {
                     tipoItem: values.tipoItem,
                 };
 
+                console.log("Criando novo item:", novoItem);
                 await criarItem(novoItem);
-                console.log("Item criado com sucesso");
 
                 toast({
                     title: "Sucesso!",
@@ -84,9 +87,9 @@ export function FormNovoItem({ item }: PropsItem) {
                 });
             }
 
-            setIsOpen(false); // Fechar o modal após a submissão
+            setIsOpen(false);
         } catch (error) {
-            console.error("Erro ao salvar item", error); // Log de erro
+            console.error("Erro ao criar/editar item:", error);
             toast({
                 title: "Erro!",
                 description: "Erro ao criar/editar item",
@@ -98,21 +101,12 @@ export function FormNovoItem({ item }: PropsItem) {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                {item ? (
-                    <Button
-                        variant="outline"
-                        className="bg-slate-300 hover:bg-sky-700 shadow-md w-full text-lg text-slate-50 hover:text-white"
-                    >
-                        <PlusCircle />
-                    </Button>
-                ) : (
-                    <Button
-                        variant="outline"
-                        className="bg-sky-700 shadow-md w-1/6 text-lg text-slate-50 hover:bg-slate-400"
-                    >
-                        Novo Item
-                    </Button>
-                )}
+                <Button
+                    variant="outline"
+                    className={item ? "bg-slate-300 hover:bg-sky-700 shadow-md w-full text-lg text-slate-50 hover:text-white" : "bg-sky-700 shadow-md w-1/6 text-lg text-slate-50 hover:bg-slate-400"}
+                >
+                    {item ? <PlusCircle /> : "Novo Item"}
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <div className="grid gap-4 py-4">
@@ -126,31 +120,46 @@ export function FormNovoItem({ item }: PropsItem) {
                                         <FormItem>
                                             <FormLabel>Número de Série</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    className="border border-[#A7A7A7]"
-                                                    {...field}
-                                                />
+                                                <Input className="border border-[#A7A7A7]" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="titulo"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Título</FormLabel>
+                                
+                                
+                            <FormField
+                                control={form.control}
+                                name="titulo"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Titulo</FormLabel>
+                                        <Select onValueChange={field.onChange} {...field}>
                                             <FormControl>
-                                                <Input
-                                                    className="border border-[#A7A7A7]"
-                                                    {...field}
-                                                />
+                                                <SelectTrigger className="w-full border border-[#A7A7A7]">
+                                                    <SelectValue placeholder="Selecione a modalidade"></SelectValue>
+                                                </SelectTrigger>
                                             </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                            <SelectContent>
+                                                {titulos && titulos.length > 0 ? (
+                                                    titulos.map((titulo) => (
+                                                        <SelectItem key={titulo.idTitulo} value={titulo.idTitulo}>
+                                                            {titulo.nome}
+                                                        </SelectItem>
+                                                    ))
+                                                ) : (
+                                                    <SelectItem disabled value="sem-titulos">
+                                                        Sem titulos cadastradas
+                                                    </SelectItem>
+                                                )}
+
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
                                 <FormField
                                     control={form.control}
                                     name="dtAquisicao"
@@ -161,8 +170,8 @@ export function FormNovoItem({ item }: PropsItem) {
                                                 <Input
                                                     type="date"
                                                     className="border border-[#A7A7A7]"
-                                                    value={field.value ? field.value.toISOString().split('T')[0] : ''} // Conversão para string
-                                                    onChange={(e) => field.onChange(new Date(e.target.value))} // Conversão para Date
+                                                    value={field.value ? field.value.toISOString().split("T")[0] : ""}
+                                                    onChange={(e) => field.onChange(new Date(e.target.value))}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -176,10 +185,7 @@ export function FormNovoItem({ item }: PropsItem) {
                                         <FormItem>
                                             <FormLabel>Tipo</FormLabel>
                                             <FormControl>
-                                                <select
-                                                    className="border border-[#A7A7A7] w-full"
-                                                    {...field}
-                                                >
+                                                <select className="border border-[#A7A7A7] w-full" {...field}>
                                                     <option value="Fita">Fita</option>
                                                     <option value="DVD">DVD</option>
                                                     <option value="BlueRay">BlueRay</option>
