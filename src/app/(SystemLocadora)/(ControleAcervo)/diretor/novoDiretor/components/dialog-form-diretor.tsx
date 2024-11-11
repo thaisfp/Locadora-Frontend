@@ -49,23 +49,23 @@ export function FormNovoDiretor({ diretor }: PropsDiretor) {
                     nome: values.nome,
                 };
 
-                await editarDiretor(editDiretor);
-
-                toast({
-                    title: "Sucesso!",
-                    description: "Diretor editado com sucesso",
-                });
+                await editarDiretor(editDiretor).then((res) => {
+                    console.log(res)
+        
+                    toast({ title: "Sucesso!", description: "Diretor editado com sucesso" });
+                    window.location.reload();
+                })
             } else {
                 const novoDiretor = {
                     nome: values.nome,
                 };
 
-                await criarDiretor(novoDiretor);
-
-                toast({
-                    title: "Sucesso!",
-                    description: "Diretor criado com sucesso",
-                });
+                await criarDiretor(novoDiretor).then((res) => {
+                    console.log(res)
+        
+                    toast({ title: "Sucesso!", description: "Diretor criado com sucesso" });
+                    window.location.reload();
+                })
             }
 
             setIsOpen(false);

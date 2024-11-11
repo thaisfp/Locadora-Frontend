@@ -1,3 +1,4 @@
+
 import { Titulo } from "./titulo";
 
 export interface Item {
@@ -5,14 +6,14 @@ export interface Item {
   numSerie: string;
   titulo: Titulo;
   dtAquisicao: Date;
-  tipoItem: "Fita" | "DVD" | "BlueRay";
+  tipoItem: string;
 }
 
 export interface ItemCreate {
   numSerie: string;
   titulo: { idTitulo: string };
   dtAquisicao: Date;
-  tipoItem: "Fita" | "DVD" | "BlueRay";
+  tipoItem: string;
 }
 
 export interface ItemUpdate extends ItemCreate {

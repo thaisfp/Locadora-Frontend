@@ -76,12 +76,12 @@ export function FormNovaClasse({ classe }: PropsClasse) {
           dataDevolucao: values.dataDevolucao,
         };
 
-        await editarClasse(editClasse);
+        await editarClasse(editClasse).then((res) => {
+          console.log(res)
 
-        toast({
-          title: "Sucesso!",
-          description: "Classe editada com sucesso",
-        });
+          toast({ title: "Sucesso!", description: "Classe editada com sucesso" });
+          window.location.reload();
+      })
       } else {
         const novaClasse = {
           nome: values.nome,
@@ -89,12 +89,12 @@ export function FormNovaClasse({ classe }: PropsClasse) {
           dataDevolucao: values.dataDevolucao,
         };
 
-        await criarClasse(novaClasse);
+        await criarClasse(novaClasse).then((res) => {
+          console.log(res)
 
-        toast({
-          title: "Sucesso!",
-          description: "Classe criada com sucesso",
-        });
+          toast({ title: "Sucesso!", description: "Classe criada com sucesso" });
+          window.location.reload();
+      })
       }
 
       setIsOpen(false);

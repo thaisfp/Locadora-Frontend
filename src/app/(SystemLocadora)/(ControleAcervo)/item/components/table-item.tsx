@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/table";
 import { ArrowUpDown } from "lucide-react";
 import { DialogDeletarItem } from "./dialog-remover-item";
-import { Item, ItensArray } from "@/model/item";
+import { ItensArray } from "@/model/item";
 import { Titulo } from "@/model/titulo";
 import EditarItem from "../editarItem/[id]/page";
 
@@ -41,7 +41,7 @@ export type Item = {
   numSerie: string;
   titulo: Titulo;
   dtAquisicao: Date;
-  tipoItem: string; // e.g., "Fita", "DVD", "BluRay"
+  tipoItem: string;
 };
 
 export const columns: ColumnDef<Item>[] = [
@@ -79,28 +79,45 @@ export const columns: ColumnDef<Item>[] = [
         <ArrowUpDown className="w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.getValue("numeroSerie")}</div>,
+    cell: ({ row }) => (
+      <div className="pl-3 flex justify-center">{row.original.numSerie}</div>
+    ),
   },
   {
     accessorKey: "titulo",
     header: "Título",
-    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.getValue("titulo")}</div>,
+    cell: ({ row }) => (
+      <div className="pl-3 flex justify-center">{row.original.titulo.nome}</div>
+    ),
   },
   {
     accessorKey: "dtAquisicao",
     header: "Data de Aquisição",
-    cell: ({ row }) => (
-      <div className="pl-3 flex justify-center">{new Date(row.getValue("dataAquisicao")).toLocaleDateString()}</div>
-    ),
+    cell: ({ row }) => {
+      const data = new Date(row.original.dtAquisicao);
+      return (
+        <div className="capitalize pl-3 flex justify-center ">
+          {data.toLocaleDateString("pt-BR", {
+            timeZone: "UTC",
+          })}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "tipoItem",
     header: "Tipo",
-    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.getValue("tipo")}</div>,
+    cell: ({ row }) => (
+      <div className="pl-3 flex justify-center">{row.original.tipoItem}</div>
+    ),
   },
   {
     accessorKey: "acoes",
-    header: () => <Button variant="ghost" className="w-full">Ações</Button>,
+    header: () => (
+      <Button variant="ghost" className="w-full">
+        Ações
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="flex gap-5 justify-center">
         <EditarItem itemObj={row.original} />
@@ -116,8 +133,11 @@ interface PropsItem {
 
 export function DataTableItem({ itens }: PropsItem) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
@@ -152,16 +172,19 @@ export function DataTableItem({ itens }: PropsItem) {
         />
         <DropdownMenu>
           <DropdownMenuContent align="end">
-            {table.getAllColumns().filter((column) => column.getCanHide()).map((column) => (
-              <DropdownMenuCheckboxItem
-                key={column.id}
-                className="capitalize"
-                checked={column.getIsVisible()}
-                onCheckedChange={(value) => column.toggleVisibility(!!value)}
-              >
-                {column.id}
-              </DropdownMenuCheckboxItem>
-            ))}
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  className="capitalize"
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                >
+                  {column.id}
+                </DropdownMenuCheckboxItem>
+              ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -174,7 +197,10 @@ export function DataTableItem({ itens }: PropsItem) {
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -183,17 +209,26 @@ export function DataTableItem({ itens }: PropsItem) {
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   Nenhum resultado encontrado.
                 </TableCell>
               </TableRow>

@@ -59,7 +59,8 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
         atores: z.array(z.string()).nonempty({ message: "Selecione pelo menos um ator!" }),
         diretor: z.string({ required_error: "Diretor é obrigatório!" }),
         ano: z.coerce.number({ invalid_type_error: "Ano é obrigatório" })
-            .min(1900, { message: "Ano deve ser maior que 1900" }),
+        .min(1900, { message: "Ano deve ser maior que 1900" })
+        .max(new Date().getFullYear(), {message: "Ano não pode ser maior que o atual" }),
         sinopse: z.string({ required_error: "Sinopse é obrigatória!" })
             .min(10, { message: "Sinopse deve ter no mínimo 10 caracteres" }),
         categoria: z.string({ required_error: "Categoria é obrigatória!" }),
@@ -131,8 +132,12 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
 
                 console.log("TITULO === ", novoTitulo);
 
-                await criarTitulo(novoTitulo);
-                toast({ title: "Sucesso!", description: "Título criado com sucesso" });
+                await criarTitulo(novoTitulo).then((res) => {
+                    console.log(res)
+
+                    toast({ title: "Sucesso!", description: "Título criado com sucesso" });
+                    window.location.reload();
+                })
             }
 
             setIsOpen(false);
@@ -231,7 +236,7 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                                         <Select onValueChange={field.onChange} {...field}>
                                             <FormControl>
                                                 <SelectTrigger className="w-full border border-[#A7A7A7]">
-                                                    <SelectValue placeholder="Selecione a modalidade"></SelectValue>
+                                                    <SelectValue placeholder="Selecione um diretor"></SelectValue>
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
@@ -263,7 +268,7 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                                         <Select onValueChange={field.onChange} {...field}>
                                             <FormControl>
                                                 <SelectTrigger className="w-full border border-[#A7A7A7]">
-                                                    <SelectValue placeholder="Selecione a modalidade"></SelectValue>
+                                                    <SelectValue placeholder="Selecione uma classe"></SelectValue>
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>

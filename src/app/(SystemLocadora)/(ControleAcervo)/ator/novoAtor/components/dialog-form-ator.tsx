@@ -29,7 +29,9 @@ export function FormNovoAtor({ ator }: PropsAtor) {
   const [isOpen, setIsOpen] = useState(false);
 
   const formSchema = z.object({
-    nome: z.string({required_error: "Nome do Ator é obrigatório!"}).min(2, { message: "Número insuficiente de caracteres" }),
+    nome: z
+      .string({ required_error: "Nome do Ator é obrigatório!" })
+      .min(2, { message: "Número insuficiente de caracteres" }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,22 +51,22 @@ export function FormNovoAtor({ ator }: PropsAtor) {
           nome: values.nome,
         };
 
-        await editarAtor(editAtor);
+        await editarAtor(editAtor).then((res) => {
+          console.log(res);
 
-        toast({
-          title: "Sucesso!",
-          description: "Ator editado com sucesso",
+          toast({ title: "Sucesso!", description: "Ator editado com sucesso" });
+          window.location.reload();
         });
       } else {
         const novoAtor = {
           nome: values.nome,
         };
 
-        await criarAtor(novoAtor);
+        await criarAtor(novoAtor).then((res) => {
+          console.log(res);
 
-        toast({
-          title: "Sucesso!",
-          description: "Ator criado com sucesso",
+          toast({ title: "Sucesso!", description: "Ator criado com sucesso" });
+          window.location.reload();
         });
       }
 

@@ -1,27 +1,22 @@
 "use client";
 
-import { useItemHook } from "@/hooks/item";
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
 import { FormNovoItem } from "../../novoItem/components/dialog-form-item"; 
+import { Item } from "../../components/table-item";
 
 interface EditarItemProps {
-    id: string;
+    itemObj: Item;
 }
 
-export default function EditarItem({ id }: EditarItemProps) {
-    const { item, selecionarItem } = useItemHook();
+export default function EditarItem({ itemObj }: EditarItemProps) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchData = async () => {
-            await selecionarItem(id); // Seleciona o item com o ID específico
-            setIsLoading(false);
-        };
-
-        fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
+        setIsLoading(false);
+  
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [itemObj.id]);
 
     if (isLoading) {
         return (
@@ -34,7 +29,7 @@ export default function EditarItem({ id }: EditarItemProps) {
 
     return (
         <div>
-            <FormNovoItem item={item!}></FormNovoItem> {/* Passa o item selecionado para o formulário */}
+            <FormNovoItem item={itemObj!}></FormNovoItem>
         </div>
     );
 }
