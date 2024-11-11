@@ -44,21 +44,21 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
 
     useEffect(() => {
         const fetchData = async () => {
-          await listarAtores(); 
-          await listarClasses();
-          await listarDiretores();
+            await listarAtores();
+            await listarClasses();
+            await listarDiretores();
         };
-    
+
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    
+
     const formSchema = z.object({
         nome: z.string({ required_error: "Nome do Título é obrigatório!" })
             .min(2, { message: "Número insuficiente de caracteres" }),
         atores: z.array(z.string()).nonempty({ message: "Selecione pelo menos um ator!" }),
         diretor: z.string({ required_error: "Diretor é obrigatório!" }),
-        ano: z.number({ invalid_type_error: "Ano é obrigatório" })
+        ano: z.coerce.number({ invalid_type_error: "Ano é obrigatório" })
             .min(1900, { message: "Ano deve ser maior que 1900" }),
         sinopse: z.string({ required_error: "Sinopse é obrigatória!" })
             .min(10, { message: "Sinopse deve ter no mínimo 10 caracteres" }),
@@ -110,14 +110,14 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
 
                 console.log("TITULO === ", editTitulo);
 
-                await editarTitulo(editTitulo).then((res)=>{
+                await editarTitulo(editTitulo).then((res) => {
                     console.log(res)
 
                     toast({ title: "Sucesso!", description: "Título editado com sucesso" });
                     window.location.reload();
                 })
 
-            
+
             } else {
                 const novoTitulo = {
                     nome: values.nome,
@@ -130,7 +130,7 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                 };
 
                 console.log("TITULO === ", novoTitulo);
-                
+
                 await criarTitulo(novoTitulo);
                 toast({ title: "Sucesso!", description: "Título criado com sucesso" });
             }
@@ -290,12 +290,16 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                                 <FormItem>
                                     <FormLabel>Ano</FormLabel>
                                     <FormControl>
-                                        <Input type="number" className="border border-[#A7A7A7]" {...field} />
+                                        <Input
+                                            type="number"
+                                            className="border border-[#A7A7A7]"
+                                            value={field.value}
+                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || '')}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
-
 
                             <FormField control={form.control} name="sinopse" render={({ field }) => (
                                 <FormItem>
