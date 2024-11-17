@@ -3,16 +3,19 @@
 import { DataTableClasse } from "./components/table-classe"; 
 import { useClasseHook } from "@/hooks/classe"; 
 import { FormNovaClasse } from "./novaClasse/components/dialog-form-classe"; 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Classe() {
   const { classes, listarClasses } = useClasseHook(); 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsLoading(true);
-    listarClasses();
+    const fetchData = async () => {
+      await listarClasses();
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

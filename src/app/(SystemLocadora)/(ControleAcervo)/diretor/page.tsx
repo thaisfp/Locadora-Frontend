@@ -2,17 +2,20 @@
 
 import { DataTableDiretor } from "./components/table-diretor"; 
 import { useDiretorHook } from "@/hooks/diretor"; 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FormNovoDiretor } from "./novoDiretor/components/dialog-form-diretor";
 
 export default function Diretor() {
   const { diretores, listarDiretores } = useDiretorHook(); 
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
-    listarDiretores();
+    const fetchData = async () => {
+      await listarDiretores();
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

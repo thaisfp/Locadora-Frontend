@@ -24,7 +24,7 @@ export function DialogDeletarClasse({ classeId }: IdClasseProps) {
 
   async function removerClasse(classeId: string) {
     deletarClasse(classeId)
-      .then((response) => {
+      .then(() => {
         router.refresh();
         toast({
           title: "Sucesso!",
@@ -32,7 +32,7 @@ export function DialogDeletarClasse({ classeId }: IdClasseProps) {
             "A classe foi removida com sucesso!",
         });
       })
-      .catch((response) => {
+      .catch(() => {
         toast({
           title: "Erro!",
           description:
