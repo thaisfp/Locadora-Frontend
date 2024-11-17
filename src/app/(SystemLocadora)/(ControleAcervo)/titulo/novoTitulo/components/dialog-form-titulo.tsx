@@ -97,7 +97,6 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
             });
 
             if (titulo) {
-                console.log("IF ===== ", titulo)
                 const editTitulo = {
                     idTitulo: titulo?.idTitulo,
                     nome: values.nome,
@@ -108,8 +107,6 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                     categoria: values.categoria,
                     classe: { id: values.classe },
                 };
-
-                console.log("TITULO === ", editTitulo);
 
                 await editarTitulo(editTitulo).then((res) => {
                     console.log(res)
@@ -129,8 +126,6 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
                     categoria: values.categoria,
                     classe: { id: values.classe },
                 };
-
-                console.log("TITULO === ", novoTitulo);
 
                 await criarTitulo(novoTitulo).then((res) => {
                     console.log(res)

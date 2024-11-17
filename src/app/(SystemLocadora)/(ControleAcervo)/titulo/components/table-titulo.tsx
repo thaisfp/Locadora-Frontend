@@ -136,7 +136,7 @@ export const columns: ColumnDef<Titulo>[] = [
     },
     cell: ({ row }) => (
       <div className="flex gap-5 justify-center ">
-        <EditarTitulo tituloObj={row.original}></EditarTitulo>
+        <EditarTitulo params={{tituloObj: row.original}}></EditarTitulo>
 
         <DialogDeletarTitulo tituloId={row.original.idTitulo}/>
       </div>

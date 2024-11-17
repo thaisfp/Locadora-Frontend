@@ -120,7 +120,7 @@ export const columns: ColumnDef<Item>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex gap-5 justify-center">
-        <EditarItem itemObj={row.original} />
+        <EditarItem params={{itemObj: row.original}} />
         <DialogDeletarItem itemId={row.original.id} />
       </div>
     ),

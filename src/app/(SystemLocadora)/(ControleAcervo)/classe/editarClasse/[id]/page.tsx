@@ -6,10 +6,13 @@ import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
 
 interface EditarClasseProps {
-  id: string;
+  params:{
+    id: string;
+  };
 }
 
-export default function EditarClasse({ id }: EditarClasseProps) {
+export default function EditarClasse({ params }: EditarClasseProps) {
+  const {id} = params;
   const { classe, selecionarClasse } = useClasseHook();
   const [isLoading, setIsLoading] = useState(true);
 

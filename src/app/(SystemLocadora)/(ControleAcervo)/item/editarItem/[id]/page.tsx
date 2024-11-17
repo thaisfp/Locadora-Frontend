@@ -6,10 +6,13 @@ import { FormNovoItem } from "../../novoItem/components/dialog-form-item";
 import { Item } from "../../components/table-item";
 
 interface EditarItemProps {
-    itemObj: Item;
+    params:{
+           itemObj: Item;
+ 
+    };
 }
 
-export default function EditarItem({ itemObj }: EditarItemProps) {
+export default function EditarItem({params: { itemObj } }: EditarItemProps) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
