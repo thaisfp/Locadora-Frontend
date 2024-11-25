@@ -1,28 +1,31 @@
-FROM node:latest
+# Usa uma imagem base com Node.js
+FROM node:18-alpine AS builder
 
-# Define o diretório de trabalho dentro do contêiner
-WORKDIR /tmp/react
+# Define o diretório de trabalho dentro do container
+WORKDIR /app
 
-# Copia os arquivos da aplicação para o contêiner
-COPY . .
-
-# Remove qualquer dependência existente
-RUN rm -rf node_modules
+# Copia os arquivos de dependência para o container
+COPY package.json package-lock.json ./ 
 
 # Instala as dependências
 RUN npm install
 
-# Gera a build de produção
+# Copia todo o projeto para o container
+COPY . .
+
+# Constrói o projeto Next.js
 RUN npm run build
 
-# Cria o diretório onde os arquivos serão movidos
-RUN mkdir -p /var/www/html
+# Usa uma imagem mínima para servir a aplicação
+FROM node:18-alpine AS runner
 
-# Move os arquivos de build do Next.js para o destino
-RUN mv .next /var/www/html
+WORKDIR /app
 
-# Limpa o diretório de trabalho temporário
-WORKDIR /
+# Copia o build do estágio anterior
+COPY --from=builder /app/ .
 
-RUN rm -rf /tmp/react
+# Expõe a porta da aplicação
+EXPOSE 3000
 
+# Comando para iniciar a aplicação
+CMD ["npm", "run", "start"]

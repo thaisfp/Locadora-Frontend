@@ -1,0 +1,61 @@
+version: "3.9" # Define a versão do arquivo de configuração do Docker Compose.
+
+services:
+  traefik:
+    image: traefik:v2.10 # Define a imagem utilizada pelo serviço Traefik.
+    container_name: traefik # Nome do contêiner para facilitar identificação.
+    command:
+      - --api.insecure=true # Habilita o painel de controle do Traefik sem autenticação (apenas para ambientes de teste).
+      - --providers.docker=true # Permite que o Traefik detecte os serviços configurados no Docker.
+      - --entrypoints.web.address=:80 # Configura a porta de entrada HTTP no Traefik.
+    ports:
+      - "80:80" # Expõe a porta 80 do Traefik para acesso HTTP.
+      - "8080:8080" # Expõe a porta 8080 para acesso ao painel administrativo do Traefik.
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Monta o socket Docker para que o Traefik acesse as configurações dos contêineres.
+
+  frontend:
+    build:
+      context: . # Diretório atual contém os arquivos para build da imagem.
+    container_name: locadora-front # Nome do contêiner para o frontend.
+    ports:
+      - "3000:3000" # Expõe a porta 3000 local para acesso ao frontend.
+    labels:
+      - "traefik.enable=true" # Habilita o Traefik para gerenciar este serviço.
+      - "traefik.http.routers.frontend.rule=Host(`frontend.locadora`)" # Define a regra de roteamento com base no host "frontend.locadora".
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000" # Porta usada pelo serviço dentro do contêiner.
+
+  frontend-slave:
+    build:
+      context: . # Usa o mesmo diretório para build, possivelmente com código duplicado.
+    container_name: locadora-front-slave # Nome do contêiner para o segundo frontend (slave).
+    ports:
+      - "3001:3000" # Mapeia a porta 3001 local para a porta 3000 no contêiner.
+    labels:
+      - "traefik.enable=true" # Habilita o Traefik para este serviço.
+      - "traefik.http.routers.frontend.rule=Host(`frontend.locadora`)" # Regra de roteamento (mesma do frontend principal).
+      - "traefik.http.services.frontend.loadbalancer.server.port=3001" # Porta do serviço dentro do contêiner.
+
+  backend:
+    build:
+      context: C:\Users\thais\OneDrive\Área de Trabalho\PERIODOS FACULDADE\6 PERIODO\Dev Web II\Locadora\locadora-backend\ 
+      # Caminho do código-fonte para build da imagem do backend.
+    container_name: locadora-back # Nome do contêiner para o backend.
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/locadora 
+        # Configuração do Spring para acessar o banco de dados PostgreSQL.
+    ports:
+      - "5020:5020" # Expõe a porta 5020 local para o backend.
+    labels:
+      - "traefik.enable=true" # Habilita o Traefik para gerenciar este serviço.
+      - "traefik.http.routers.backend.rule=Host(`backend.locadora`)" # Regra de roteamento com base no host "backend.locadora".
+      - "traefik.http.services.backend.loadbalancer.server.port=5020" # Porta usada pelo serviço dentro do contêiner.
+
+  postgres:
+    image: postgres # Define a imagem do PostgreSQL.
+    container_name: postgres # Nome do contêiner para o PostgreSQL.
+    environment:
+      POSTGRES_USER: postgres # Define o nome de usuário padrão para o banco.
+      POSTGRES_PASSWORD: postgres # Define a senha para o banco.
+    ports:
+      - 5432:5432 # Expõe a porta 5432 local para acessar o PostgreSQL.
