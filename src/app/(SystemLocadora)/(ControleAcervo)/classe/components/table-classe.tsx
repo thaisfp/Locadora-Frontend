@@ -137,7 +137,7 @@ export const columns: ColumnDef<Classe>[] = [
     },
     cell: ({ row }) => (
       <div className="flex gap-5 justify-center ">
-        <EditarClasse id={row.original.id}></EditarClasse>
+        <EditarClasse params={{ id: row.original.id }}></EditarClasse>
 
         <DialogDeletarClasse classeId={row.original.id}/>
       </div>

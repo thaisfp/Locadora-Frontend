@@ -73,7 +73,7 @@ export const columns: ColumnDef<Payment>[] = [
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cell: ({ row }) => (
       <div className="flex gap-5 justify-center ">
-        <EditarDiretor id={row.original.id}></EditarDiretor>
+        <EditarDiretor params={{ id: row.original.id }}></EditarDiretor>
 
         <DialogDeletarDiretor diretorId={row.original.id}/>
       </div>

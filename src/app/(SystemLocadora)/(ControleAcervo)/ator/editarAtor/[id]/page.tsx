@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useAtorHook } from "@/hooks/ator";
 import { FormNovoAtor } from "../../novoAtor/components/dialog-form-ator";
@@ -6,10 +6,13 @@ import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
 
 interface EditarAtorProps {
+  params: {
     id: string;
+  };
 }
 
-export default function EditarAtor( { id } : EditarAtorProps) {
+export default function EditarAtor({ params }: EditarAtorProps) {
+  const {id} = params;
   const { ator, selecionarAtor } = useAtorHook();
   const [isLoading, setIsLoading] = useState(true);
 

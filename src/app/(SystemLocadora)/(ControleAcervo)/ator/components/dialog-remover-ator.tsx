@@ -24,7 +24,7 @@ export function DialogDeletarAtor({ atorId }: IdAtorProps) {
 
   async function removerAtor(atorId: string) {
     deletarAtor(atorId)
-      .then((response) => {
+      .then(() => {
         router.refresh();
         toast({
           title: "Sucesso!",
@@ -32,7 +32,7 @@ export function DialogDeletarAtor({ atorId }: IdAtorProps) {
             "O atleta foi ativado novamente, agora ele poderá ter acesso ao sistema!",
         });
       })
-      .catch((response) => {
+      .catch(() => {
         toast({
           title: "Erro!",
           description:

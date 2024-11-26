@@ -24,7 +24,7 @@ export function DialogDeletarDiretor({ diretorId }: IdDiretorProps) {
 
   async function removerDiretor(diretorId: string) {
     deletarDiretor(diretorId)
-      .then((response) => {
+      .then(() => {
         router.refresh();
         toast({
           title: "Sucesso!",
@@ -32,7 +32,7 @@ export function DialogDeletarDiretor({ diretorId }: IdDiretorProps) {
             "O diretor foi removido com sucesso!",
         });
       })
-      .catch((response) => {
+      .catch(() => {
         toast({
           title: "Erro!",
           description:

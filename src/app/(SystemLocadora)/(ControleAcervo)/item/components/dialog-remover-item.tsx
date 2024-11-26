@@ -24,14 +24,14 @@ import {
   
     async function removerItem(itemId: string) {
       deletarItem(itemId)
-        .then((response) => {
+        .then(() => {
           router.refresh();
           toast({
             title: "Sucesso!",
             description: "O item foi removido com sucesso!",
           });
         })
-        .catch((response) => {
+        .catch(() => {
           toast({
             title: "Erro!",
             description:

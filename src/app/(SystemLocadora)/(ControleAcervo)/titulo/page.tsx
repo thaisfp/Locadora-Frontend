@@ -1,18 +1,21 @@
 "use client";
 
 import { useTituloHook } from "@/hooks/titulo";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FormNovoTitulo } from "./novoTitulo/components/dialog-form-titulo";
 import { DataTableTitulo } from "./components/table-titulo";
 
 export default function Titulo() {
   const { titulos, listarTitulos } = useTituloHook();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsLoading(true);
-    listarTitulos();
+    const fetchData = async () => {
+      await listarTitulos();
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   console.log("TITULOS === ", titulos)
