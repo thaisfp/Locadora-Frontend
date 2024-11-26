@@ -22,7 +22,7 @@ export interface LocacaoCreate {
   item: {id: string};        
 }
 
-export interface LocacaoUpdate extends LocacaoCreate {
+export interface LocacaoUpdate{
   id: string;     
 }
 

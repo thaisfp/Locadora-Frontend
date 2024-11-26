@@ -84,6 +84,7 @@ export const columns: ColumnDef<Payment>[] = [
 interface DiretorProps{
   diretores: DiretoresArray;
 }
+
 export function DataTableDiretor({diretores}: DiretorProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

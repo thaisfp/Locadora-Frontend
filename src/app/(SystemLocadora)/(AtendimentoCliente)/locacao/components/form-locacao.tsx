@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocacaoHook } from "@/hooks/locacao";
 import { Cliente } from "@/model/cliente";
 import { Item } from "@/model/item";
-
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -25,14 +24,17 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select";
+import { Locacao } from "@/model/locacao"
 
-const FormularioLocacao: React.FC = () => {
+interface PropsLocacao {
+    locacao?: Locacao;
+}
+
+export function FormNovaLocacao({ locacao }: PropsLocacao){
     const { criarLocacao, editarLocacao, deletarLocacao, listarLocacoes, selecionarLocacao, locacao, locacoes } = useLocacaoHook();
     const [isOpen, setIsOpen] = useState(false);
     const [clientes, setClientes] = useState<Cliente[]>([]);
     const [itens, setItens] = useState<Item[]>([]);
-    const [modoEdicao, setModoEdicao] = useState(false);
-    const [locacaoIdSelecionada, setLocacaoIdSelecionada] = useState<string | null>(null);
 
     const formSchema = z.object({
         cliente: z.string({ required_error: "Cliente é obrigatório!" }),
@@ -71,16 +73,6 @@ const FormularioLocacao: React.FC = () => {
             .number({ required_error: "Multa é obrigatório!" })
             .min(0),
     });
-
-
-    useEffect(() => {
-        const fetchData = async () => {
-            await listarLocacoes();
-        };
-
-        fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
