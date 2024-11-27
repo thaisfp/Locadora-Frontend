@@ -36,11 +36,14 @@ import { Locacao, LocacoesArray } from "@/model/locacao";
 
 export type Payment = {
   id: string;
-  cliente: string;
-  titulo: string;
-  dataLocacao: Date;
-  dataDevolucao: Date;
-  valor: number;
+  dtLocacao: Date; 
+  dtDevolucaoPrevista: Date; 
+  dtDevolucaoEfetiva?: Date;
+  valorCobrado: number;
+  multaCobrada?: number; 
+  cliente: {id: string}; 
+  item: {id: string};     
+  status: 'pendente' | 'concluido';  
 };
 
 export const columns: ColumnDef<Payment>[] = [
@@ -125,14 +128,26 @@ export const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const status = row.original.status;
+      const statusColor = status === "pendente" ? "text-red-500" : "text-green-500";
+
+      return (
+        <div className={`capitalize pl-3 flex justify-center ${statusColor}`}>
+          {status}
+        </div>
+      );
+    },
+  },  
+  {
     accessorKey: "acoes",
     header: () => (
       <Button variant="ghost" className="w-full">
         Ações
       </Button>
     ),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
     cell: ({ row }) => (
       <div className="flex gap-5 justify-center">
         <Button variant="ghost" onClick={() => alert(`Editar ${row.original.id}`)}>

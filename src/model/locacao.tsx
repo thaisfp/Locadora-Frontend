@@ -10,6 +10,7 @@ export interface Locacao {
   multaCobrada?: number; 
   cliente: Cliente; 
   item: Item;
+  status: 'pendente' | 'concluido';
 }
 
 export interface LocacaoCreate {
@@ -19,7 +20,8 @@ export interface LocacaoCreate {
   valorCobrado: number;
   multaCobrada?: number; 
   cliente: {id: string}; 
-  item: {id: string};        
+  item: {id: string};     
+  status: 'pendente' | 'concluido';   
 }
 
 export interface LocacaoUpdate{

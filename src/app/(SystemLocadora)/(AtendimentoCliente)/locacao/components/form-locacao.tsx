@@ -6,12 +6,12 @@ import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,14 +23,14 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-  } from "@/components/ui/select";
+} from "@/components/ui/select";
 import { Locacao } from "@/model/locacao"
 
 interface PropsLocacao {
     locacao?: Locacao;
 }
 
-export function FormNovaLocacao({ locacao }: PropsLocacao){
+export function FormNovaLocacao({ locacao }: PropsLocacao) {
     const { criarLocacao, editarLocacao, deletarLocacao, listarLocacoes, selecionarLocacao, locacao, locacoes } = useLocacaoHook();
     const [isOpen, setIsOpen] = useState(false);
     const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -72,6 +72,8 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
         multaCobrada: z
             .number({ required_error: "Multa é obrigatório!" })
             .min(0),
+        status: z
+            .string({ required_error: "Status é obrigatório!" }),
     });
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -89,6 +91,7 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
                     ? new Date(locacao.dtDevolucaoEfetiva)
                     : undefined,
                 multaCobrada: locacao.multaCobrada || 0,
+                status: locacao.status || 'pendente',
             }
             : {},
     });
@@ -105,6 +108,7 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
                     dtDevolucaoPrevista: values.dtDevolucaoPrevista,
                     dtDevolucaoEfetiva: values.dtDevolucaoEfetiva,
                     multaCobrada: values.multaCobrada,
+                    status: values.status,
                 };
 
                 await editarLocacao(editLocacao).then((res) => {
@@ -123,6 +127,7 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
                     dtDevolucaoPrevista: new Date(),
                     dtDevolucaoEfetiva: new Date(),
                     multaCobrada: values.multaCobrada || 0,
+                    status: values.status || 'pendente',
                 };
 
                 await criarLocacao(novaLocacao).then((res) => {
@@ -194,7 +199,7 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
                                         </FormItem>
                                     )}
                                 />
-    
+
                                 {/* Item Field */}
                                 <FormField
                                     control={form.control}
@@ -226,7 +231,7 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
                                         </FormItem>
                                     )}
                                 />
-    
+
                                 {/* Valor Cobrado Field */}
                                 <FormField
                                     control={form.control}
@@ -245,7 +250,7 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
                                         </FormItem>
                                     )}
                                 />
-    
+
                                 {/* Data de Locação */}
                                 <FormField
                                     control={form.control}
@@ -259,16 +264,16 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
                                                     className="border border-[#A7A7A7]"
                                                     value={
                                                         field.value
-                                                          ? field.value.toISOString().split("T")[0]
-                                                          : ""
-                                                      }
+                                                            ? field.value.toISOString().split("T")[0]
+                                                            : ""
+                                                    }
                                                 />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-    
+
                                 {/* Data de Devolução Prevista */}
                                 <FormField
                                     control={form.control}
@@ -282,16 +287,16 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
                                                     className="border border-[#A7A7A7]"
                                                     value={
                                                         field.value
-                                                          ? field.value.toISOString().split("T")[0]
-                                                          : ""
-                                                      }
+                                                            ? field.value.toISOString().split("T")[0]
+                                                            : ""
+                                                    }
                                                 />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-    
+
                                 {/* Data de Devolução Efetiva */}
                                 <FormField
                                     control={form.control}
@@ -305,16 +310,16 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
                                                     className="border border-[#A7A7A7]"
                                                     value={
                                                         field.value
-                                                          ? field.value.toISOString().split("T")[0]
-                                                          : ""
-                                                      }
+                                                            ? field.value.toISOString().split("T")[0]
+                                                            : ""
+                                                    }
                                                 />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-    
+
                                 {/* Multa Cobrada */}
                                 <FormField
                                     control={form.control}
@@ -333,8 +338,28 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
                                         </FormItem>
                                     )}
                                 />
+
+                                <FormField
+                                    control={form.control}
+                                    name="dtLocacao"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Data de Locação</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="date"
+                                                    {...field}
+                                                    value={field.value ? field.value.toISOString().split("T")[0] : ""}
+                                                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
                             </div>
-    
+
                             <div className="flex justify-end space-x-4">
                                 <Button
                                     type="button"
@@ -350,5 +375,5 @@ export function FormNovaLocacao({ locacao }: PropsLocacao){
                 </div>
             </DialogContent>
         </Dialog>
-    );    
+    );
 };
