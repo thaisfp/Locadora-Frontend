@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Typography } from '@components/iui';
+import { Dialog, DialogTitle, DialogContent } from '@/components/ui/dialog';
+import { Button} from '@/components/ui/button';
+import { DialogActions, TextField, Typography } from '@/components/ui';
 
 interface DevolucaoDialogProps {
     open: boolean;
@@ -11,7 +13,7 @@ const DialogDevolucao: React.FC<DevolucaoDialogProps> = ({ open, onClose }) => {
     const [dataLocacao, setDataLocacao] = useState<string | null>(null);
     const [dataPrevista, setDataPrevista] = useState<string | null>(null);
     const [valorLocacao, setValorLocacao] = useState<number | null>(null);
-    const [dataDevolucao, setDataDevolucao] = useState<string>(new Date().toISOString().split('T')[0]); // Data atual
+    const [dataDevolucao, setDataDevolucao] = useState<string>(new Date().toISOString().split('T')[0]); 
     const [multa, setMulta] = useState<number>(0);
     const [erro, setErro] = useState<string | null>(null);
 
@@ -20,7 +22,7 @@ const DialogDevolucao: React.FC<DevolucaoDialogProps> = ({ open, onClose }) => {
         const dataDevolucaoDate = new Date(dataDevolucao);
         const diffDias = Math.ceil((dataDevolucaoDate.getTime() - dataPrevistaDate.getTime()) / (1000 * 3600 * 24));
 
-        return diffDias > 0 ? diffDias * 5 : 0; // Exemplo: R$5 por dia de atraso
+        return diffDias > 0 ? diffDias * 5 : 0; 
     };
 
     const concluirDevolucao = () => {

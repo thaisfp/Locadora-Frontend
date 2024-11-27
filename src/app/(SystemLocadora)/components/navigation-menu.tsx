@@ -87,7 +87,7 @@ export function NavigationMenuHome() {
                 <li className="hover:bg-accent w-full h-[30px] flex items-center justify-center rounded-sm">
                   <a
                     className="flex text-sm leading-tight text-muted-foreground"
-                    href="/cadastrarcliente"
+                    href="/cliente"
                   >
                     {" "}
                     Cadastrar Cliente{" "}
@@ -97,23 +97,12 @@ export function NavigationMenuHome() {
                 <li className="hover:bg-accent w-full h-[30px] flex items-center justify-center rounded-sm">
                   <a
                     className="flex text-sm leading-tight text-muted-foreground"
-                    href="/efetuarlocacao"
+                    href="/locacao"
                   >
                     {" "}
                     Efetuar Locação{" "}
                   </a>
                 </li>
-
-                <li className="hover:bg-accent w-full h-[30px] flex items-center justify-center rounded-sm">
-                  <a
-                    className="flex text-sm leading-tight text-muted-foreground"
-                    href="/efetuardevolucao"
-                  >
-                    {" "}
-                    Efetuar Devolução{" "}
-                  </a>
-                </li>
-
               </ul>
 
             </NavigationMenuContent>

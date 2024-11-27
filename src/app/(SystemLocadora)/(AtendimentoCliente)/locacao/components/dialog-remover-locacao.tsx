@@ -10,7 +10,7 @@ import {
   } from "@/components/ui/alert-dialog";
   import { Button } from "@/components/ui/button";
   import { toast } from "@/components/ui/use-toast";
-  import { useLocacaoHook } from "@/hooks/locacao"; // Alterar para o hook que manipula as locações
+  import { useLocacaoHook } from "@/hooks/locacao";
   import { Trash2 } from "lucide-react";
   import { useRouter } from "next/navigation";
   
@@ -19,13 +19,13 @@ import {
   }
   
   export function DialogDeletarLocacao({ locacaoId }: IdLocacaoProps) {
-    const { deletarLocacao } = useLocacaoHook(); // Hook responsável pela lógica de exclusão da locação
+    const { deletarLocacao } = useLocacaoHook();
     const router = useRouter();
   
     async function removerLocacao(locacaoId: string) {
       deletarLocacao(locacaoId)
         .then((response) => {
-          router.refresh(); // Atualiza a página após a remoção
+          router.refresh(); 
           toast({
             title: "Sucesso!",
             description: "A locação foi removida com sucesso!",
