@@ -81,39 +81,20 @@ export function NavigationMenuHome() {
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuTrigger >Atendimento a Cliente</NavigationMenuTrigger>
-            {/* <NavigationMenuContent>
+            <NavigationMenuContent>
               <ul className=" flex flex-col justify-between p-6 lg:w-[190px]  lg:h-[150px]  items-center ">
                 <li className="hover:bg-accent w-full h-[30px] flex items-center justify-center rounded-sm">
                   <a
                     className="flex text-sm leading-tight text-muted-foreground"
-                    href="/ator"
+                    href="/atendimentoCliente/cliente"
                   >
                     {" "}
-                    Ator{" "}
+                    Cliente{" "}
                   </a>
                 </li>
 
-                <li className="hover:bg-accent w-full h-[30px] flex items-center justify-center rounded-sm">
-                  <a
-                    className="flex text-sm leading-tight text-muted-foreground"
-                    href="/ator"
-                  >
-                    {" "}
-                    Diretor{" "}
-                  </a>
-                </li>
-
-                <li className="hover:bg-accent w-full h-[30px] flex items-center justify-center rounded-sm">
-                  <a
-                    className="flex text-sm leading-tight text-muted-foreground"
-                    href="/ator"
-                  >
-                    {" "}
-                    Classe{" "}
-                  </a>
-                </li>
               </ul>
-            </NavigationMenuContent> */}
+            </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
