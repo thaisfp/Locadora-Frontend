@@ -10,22 +10,23 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAtorHook } from "@/hooks/ator";
 import { toast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { UserPen } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Cliente } from "@/model/cliente";
+import { useDependenteHook } from "@/hooks/dependente";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface PropsCliente {
   cliente?: Cliente;
 }
 
 export function FormNovoCliente({ cliente }: PropsCliente) {
-  const { criarAtor, editarAtor } = useAtorHook();
+  const { criarDependente, editarDependente } = useDependenteHook();
   const [isOpen, setIsOpen] = useState(false);
 
   const formSchema = z.object({
@@ -64,18 +65,26 @@ export function FormNovoCliente({ cliente }: PropsCliente) {
       : {},
   });
 
+  function gerarNumeroInscricaoAleatorio() {
+    return Math.floor(Math.random() * 9000) + 1000;
+  }
+
+  useEffect(() => {
+    form.setValue("numInscricao", gerarNumeroInscricaoAleatorio());
+  }, [form]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       if (cliente) {
-        const editAtor = {
-          id: cliente.id,
+        const editDependente = {
           nome: values.nome,
           numInscricao: values.numInscricao,
           sexo: values.sexo,
           dtNascimento: values.dtNascimento,
+          estahAtivo: cliente.estahAtivo,
         };
 
-        await editarAtor(editAtor).then((res) => {
+        await editarDependente(editDependente).then((res) => {
           console.log(res);
 
           toast({
@@ -85,14 +94,15 @@ export function FormNovoCliente({ cliente }: PropsCliente) {
           window.location.reload();
         });
       } else {
-        const novoAtor = {
+        const novoDependente = {
           nome: values.nome,
           numInscricao: values.numInscricao,
           sexo: values.sexo,
           dtNascimento: values.dtNascimento,
+          estahAtivo: true,
         };
 
-        await criarAtor(novoAtor).then((res) => {
+        await criarDependente(novoDependente).then((res) => {
           console.log(res);
 
           toast({
@@ -146,6 +156,7 @@ export function FormNovoCliente({ cliente }: PropsCliente) {
                         <FormLabel>Número de Inscrição</FormLabel>
                         <FormControl>
                           <Input
+                          disabled
                             type="number"
                             className="border border-[#A7A7A7] "
                             {...field}
@@ -197,21 +208,31 @@ export function FormNovoCliente({ cliente }: PropsCliente) {
                     control={form.control}
                     name="sexo"
                     render={({ field }) => (
-                      <FormItem className="flex">
+                      <FormItem className="flex-col">
                         <FormLabel>Sexo</FormLabel>
                         <FormControl>
-                          <Input
-                            type="radio"
-                            className="border border-[#A7A7A7] "
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormControl>
-                          <Input
-                            type="radio"
-                            className="border border-[#A7A7A7] "
-                            {...field}
-                          />
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex flex-row gap-5"
+                          >
+                            <FormItem className="flex items-center space-x-2 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="M" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                Masculino
+                              </FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-2 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="F" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                Feminino
+                              </FormLabel>
+                            </FormItem>
+                          </RadioGroup>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

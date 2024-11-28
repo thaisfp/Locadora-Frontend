@@ -1,5 +1,4 @@
 export interface Cliente {
-  id: string;
   numInscricao: number;
   nome: string;
   dtNascimento: Date;

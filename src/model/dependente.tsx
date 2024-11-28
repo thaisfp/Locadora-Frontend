@@ -6,4 +6,4 @@ export type DependenteCreate = ClienteCreate;
 
 export type DependenteUpdate = DependenteCreate;
 
-export type DependenteArray = Array<Dependente>;
+export type DependentesArray = Array<Dependente>;
