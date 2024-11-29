@@ -3,7 +3,7 @@
 import { useLocacaoHook } from "@/hooks/locacao";
 import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FormNovaLocacao } from "./components/form-locacao";
+import { FormNovaLocacao } from "./novaLocacao/components/form-locacao";
 import { DataTableLocacao } from "./components/table-locacao";
 
 export default function Locacao() {

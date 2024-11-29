@@ -1,5 +1,5 @@
 "use client";
-
+/*
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -208,3 +208,5 @@ function validarCpf(cpf: string): boolean {
 function validarData(data: string): boolean {
   return !isNaN(new Date(data).getTime());
 }
+
+*/

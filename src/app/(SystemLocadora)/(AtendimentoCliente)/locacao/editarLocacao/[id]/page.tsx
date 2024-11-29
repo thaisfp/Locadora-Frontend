@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
-import { FormNovaLocacao } from "../../components/form-locacao"
+import { FormNovaLocacao } from "../../novaLocacao/components/form-locacao"
 import { useLocacaoHook } from "@/hooks/locacao";
 
 interface EditarLocacaoProps {

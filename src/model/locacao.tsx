@@ -16,7 +16,6 @@ export interface Locacao {
 export interface LocacaoCreate {
   dtLocacao: Date; 
   dtDevolucaoPrevista: Date; 
-  dtDevolucaoEfetiva?: Date;
   valorCobrado: number;
   multaCobrada?: number; 
   cliente: {id: string}; 
@@ -24,7 +23,7 @@ export interface LocacaoCreate {
   status: 'pendente' | 'concluido';   
 }
 
-export interface LocacaoUpdate{
+export interface LocacaoUpdate extends LocacaoCreate{
   id: string;     
 }
 

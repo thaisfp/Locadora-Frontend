@@ -1,4 +1,4 @@
-import { FormNovaLocacao } from "../components/form-locacao";
+import { FormNovaLocacao } from "./components/form-locacao";
 
 export default function novaLocacao() {
     return (
