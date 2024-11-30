@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/.idea/Locadora-Frontend.iml" filepath="$PROJECT_DIR$/.idea/Locadora-Frontend.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/.idea/locadora.iml" filepath="$PROJECT_DIR$/.idea/locadora.iml" />
+>>>>>>> 1486074d7c35ff9325b3e8d25384c2d30250af64
     </modules>
   </component>
 </project>

@@ -92,7 +92,7 @@ export const columns: ColumnDef<Ator>[] = [
     },
     cell: ({ row }) => (
       <div className="flex gap-5 justify-center ">
-        <EditarAtor id={row.original.id}></EditarAtor>
+        <EditarAtor params={{ id: row.original.id }}></EditarAtor>
 
         <DialogDeletarAtor atorId={row.original.id}/>
       </div>

@@ -24,14 +24,14 @@ import {
   
     async function removerTitulo(tituloId: string) {
       deletarTitulo(tituloId)
-        .then((response) => {
+        .then(() => {
           router.refresh();
           toast({
             title: "Sucesso!",
             description: "O título foi removido com sucesso!",
           });
         })
-        .catch((response) => {
+        .catch(() => {
           toast({
             title: "Erro!",
             description:

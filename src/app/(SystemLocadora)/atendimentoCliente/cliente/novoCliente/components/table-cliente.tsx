@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import * as React from "react";
 import {
@@ -31,18 +31,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ArrowUpDown } from "lucide-react";
-import { Classe, ClassesArray } from "@/model/classe";
-import EditarClasse from "../editarClasse/[id]/page";
-import { DialogDeletarClasse } from "./dialog-remover-classe";
+import { Dependente, DependentesArray } from "@/model/dependente";
+import { FormSocio } from "./dialog-form-socio-dependentes";
+import { SocioArray } from "@/model/socio";
 
-export type Payment = {
-  id: string;
-  nome: string;
-  valor: number;
-  dataDevolucao: Date;
-};
-
-export const columns: ColumnDef<Classe>[] = [
+export const columns: ColumnDef<Dependente>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -66,25 +59,35 @@ export const columns: ColumnDef<Classe>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "numInscricao",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="w-full gap-2"
+      >
+        Número de Inscrição
+        <ArrowUpDown className="w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.getValue("numInscricao")}</div>,
+  },
+  {
     accessorKey: "nome",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="w-full gap-2"
-        >
-          Nome da Classe
-          <ArrowUpDown className="w-4"></ArrowUpDown>
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="pl-3 flex justify-center ">{row.getValue("nome")}</div>
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="w-full gap-2"
+      >
+        Nome do Cliente
+        <ArrowUpDown className="w-4" />
+      </Button>
     ),
+    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.getValue("nome")}</div>,
   },
   {
-    accessorKey: "valor",
+    accessorKey: "dtNascimento",
     header: ({ column }) => {
       return (
         <Button
@@ -92,31 +95,13 @@ export const columns: ColumnDef<Classe>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="w-full gap-2"
         >
-          Valor
-          <ArrowUpDown className="w-4"></ArrowUpDown>
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="pl-3 flex justify-center ">{row.getValue("valor")}</div>
-    ),
-  },
-  {
-    accessorKey: "dataDevolucao",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="w-full gap-2"
-        >
-          Data de Devolução
+          Data de Nascimento
           <ArrowUpDown className="w-4"></ArrowUpDown>
         </Button>
       );
     },
     cell: ({ row }) => {
-      const data = new Date(row.original.dataDevolucao);
+      const data = new Date(row.original.dtNascimento);
       return (
           <div className="capitalize pl-3 flex justify-center " >
               {data.toLocaleDateString('pt-BR', {
@@ -137,29 +122,27 @@ export const columns: ColumnDef<Classe>[] = [
     },
     cell: ({ row }) => (
       <div className="flex gap-5 justify-center ">
-        <EditarClasse params={{ id: row.original.id }}></EditarClasse>
-
-        <DialogDeletarClasse classeId={row.original.id}/>
+        <FormSocio params={{clienteObj: row.original}}></FormSocio>
+        {/* <EditarTitulo params={{tituloObj: row.original}}></EditarTitulo>
+        <DialogDeletarTitulo tituloId={row.original.idTitulo}/> */}
       </div>
     ),
   },
 ];
 
-interface PropsClasse {
-  classes: ClassesArray;
+interface PropsCliente {
+  dependentes: DependentesArray;
+  socios: SocioArray
 }
 
-export function DataTableClasse({ classes }: PropsClasse) {
+export function DataTableCliente({ dependentes }: PropsCliente) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data: classes ?? [],
+    data: dependentes ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -190,23 +173,16 @@ export function DataTableClasse({ classes }: PropsClasse) {
         />
         <DropdownMenu>
           <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
+            {table.getAllColumns().filter((column) => column.getCanHide()).map((column) => (
+              <DropdownMenuCheckboxItem
+                key={column.id}
+                className="capitalize"
+                checked={column.getIsVisible()}
+                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+              >
+                {column.id}
+              </DropdownMenuCheckboxItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -215,45 +191,31 @@ export function DataTableClasse({ classes }: PropsClasse) {
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Nenhum resultado encontrado.
                 </TableCell>
               </TableRow>
             )}
@@ -262,8 +224,8 @@ export function DataTableClasse({ classes }: PropsClasse) {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} de{" "}
+          {table.getFilteredRowModel().rows.length} linha(s) selecionada(s).
         </div>
         <div className="space-x-2">
           <Button
@@ -272,7 +234,7 @@ export function DataTableClasse({ classes }: PropsClasse) {
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Previous
+            Anterior
           </Button>
           <Button
             variant="outline"
@@ -280,7 +242,7 @@ export function DataTableClasse({ classes }: PropsClasse) {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next
+            Próximo
           </Button>
         </div>
       </div>

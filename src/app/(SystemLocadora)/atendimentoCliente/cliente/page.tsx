@@ -1,33 +1,35 @@
 "use client";
 
-import { useTituloHook } from "@/hooks/titulo";
 import { useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FormNovoTitulo } from "./novoTitulo/components/dialog-form-titulo";
-import { DataTableTitulo } from "./components/table-titulo";
+import { DataTableCliente } from "./novoCliente/components/table-cliente";
+import { useDependenteHook } from "@/hooks/dependente";
+import { FormNovoCliente } from "./novoCliente/components/dialog-form-cliente";
+import { useSocioHook } from "@/hooks/socio";
 
 export default function Titulo() {
-  const { titulos, listarTitulos } = useTituloHook();
+  const { dependentes, listarDependentes } = useDependenteHook();
+  const { socios } = useSocioHook();
 
   useEffect(() => {
     const fetchData = async () => {
-      await listarTitulos();
+      await listarDependentes();
     };
 
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log("TITULOS === ", titulos)
+  console.log("TITULOS === ", dependentes)
   return (
     <ScrollArea className="h-screen">
       <div className="w-full h-screen p-10 ">
         <div className="w-full h-full p-10">
           <div className="flex justify-end">
-            <FormNovoTitulo />
+            <FormNovoCliente />
           </div>
           <div>
-            <DataTableTitulo titulos={titulos!} />
+            <DataTableCliente dependentes={dependentes!} socios={socios!}/>
           </div>
         </div>
       </div>

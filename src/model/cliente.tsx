@@ -1,33 +1,21 @@
 export interface Cliente {
-    id: string;
-    nome: string;
-    endereco: string;
-    telefone: string;
-    sexo: 'M' | 'F';
-    cpf: string;
-    dataNascimento: string; // Formato ISO-8601
-    ativo: boolean;
-    tipo: 'SOCIO' | 'DEPENDENTE'; // Distinção entre sócio e dependente
+  numInscricao: number;
+  nome: string;
+  dtNascimento: Date;
+  sexo: string;
+  estahAtivo: boolean;
 }
 
 export interface ClienteCreate {
-    nome: string;
-    endereco: string;
-    telefone: string;
-    sexo: 'M' | 'F';
-    cpf: string;
-    dataNascimento: string;
-    tipo: 'SOCIO' | 'DEPENDENTE';
+  numInscricao: number;
+  nome: string;
+  dtNascimento: Date;
+  sexo: string;
+  estahAtivo: boolean;
 }
 
-export interface ClienteUpdate {
-    id: string;
-    nome?: string;
-    endereco?: string;
-    telefone?: string;
-    sexo?: 'M' | 'F';
-    cpf?: string;
-    dataNascimento?: string;
+export interface ClienteUpdate extends ClienteCreate {
+  numInscricao: number;
 }
 
-export type ClientesArray = Array<Cliente>;
+export type ClienteArray = Array<Cliente>;

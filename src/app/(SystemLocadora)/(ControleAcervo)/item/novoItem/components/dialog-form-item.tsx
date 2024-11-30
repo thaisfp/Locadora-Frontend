@@ -29,7 +29,7 @@ import { useEffect, useState } from "react";
 import { useTituloHook } from "@/hooks/titulo";
 
 interface PropsItem {
-  item: Item;
+  item?: Item;
 }
 
 export function FormNovoItem({ item }: PropsItem) {

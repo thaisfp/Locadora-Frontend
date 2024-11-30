@@ -1,21 +1,23 @@
 "use client";
 
 import { useItemHook } from "@/hooks/item";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FormNovoItem } from "./novoItem/components/dialog-form-item";
 import { DataTableItem } from "./components/table-item";
 
 export default function Item() {
   const { itens, listarItens } = useItemHook();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsLoading(true);
-    listarItens();
+    const fetchData = async () => {
+      await listarItens();
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log("ITENS === ", itens)
   return (
     <ScrollArea className="h-screen">
       <div className="w-full h-screen p-10 ">
