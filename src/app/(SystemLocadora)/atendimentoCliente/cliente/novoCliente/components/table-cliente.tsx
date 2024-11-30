@@ -31,21 +31,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ArrowUpDown } from "lucide-react";
-import { Ator } from "@/model/ator";
-import { Classe } from "@/model/classe";
-import { Diretor } from "@/model/diretor";
 import { Dependente, DependentesArray } from "@/model/dependente";
-
-export type Payment = {
-  id: string;
-  nome: string;
-  atores: Array<Ator>;
-  diretor: Diretor;
-  ano: number;
-  sinopse: string;
-  categoria: string;
-  classe: Classe;
-};
+import { FormSocio } from "./dialog-form-socio-dependentes";
+import { SocioArray } from "@/model/socio";
 
 export const columns: ColumnDef<Dependente>[] = [
   {
@@ -98,58 +86,53 @@ export const columns: ColumnDef<Dependente>[] = [
     ),
     cell: ({ row }) => <div className="pl-3 flex justify-center">{row.getValue("nome")}</div>,
   },
-  // {
-  //   accessorKey: "diretor",
-  //   header: "Diretor",
-  //   cell: ({ row }) => (<div className="pl-3 flex justify-center">
-  //       {row.original.diretor ? row.original.diretor.nome : "Diretor não disponível"}
-  //     </div>
-  //   ),
-  // },
-  // {
-  //   accessorKey: "ano",
-  //   header: "Ano",
-  //   cell: ({ row }) => <div className="pl-3 flex justify-center">{row.getValue("ano")}</div>,
-  // },
-  // {
-  //   accessorKey: "sinopse",
-  //   header: "Sinopse",
-  //   cell: ({ row }) => <div className="pl-3">{row.getValue("sinopse")}</div>,
-  // },
-  // {
-  //   accessorKey: "categoria",
-  //   header: "Categoria",
-  //   cell: ({ row }) => <div className="pl-3 flex justify-center">{row.getValue("categoria")}</div>,
-  // },
-  // {
-  //   accessorKey: "classe",
-  //   header: "Classe",
-  //   cell: ({ row }) => 
-  //   <div className="pl-3 flex justify-center">
-  //     {row.original.classe ? row.original.classe.nome : "Classe não disponível"}
-  //     </div>,
-  // },
-  // {
-  //   accessorKey: "acoes",
-  //   header: ({}) => {
-  //     return (
-  //       <Button variant="ghost" className="w-full">
-  //         Ações
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => (
-  //     <div className="flex gap-5 justify-center ">
-  //       {/* <EditarTitulo params={{tituloObj: row.original}}></EditarTitulo>
-
-  //       <DialogDeletarTitulo tituloId={row.original.idTitulo}/> */}
-  //     </div>
-  //   ),
-  // },
+  {
+    accessorKey: "dtNascimento",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="w-full gap-2"
+        >
+          Data de Nascimento
+          <ArrowUpDown className="w-4"></ArrowUpDown>
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const data = new Date(row.original.dtNascimento);
+      return (
+          <div className="capitalize pl-3 flex justify-center " >
+              {data.toLocaleDateString('pt-BR', {
+                  timeZone: 'UTC',
+              })}
+          </div >
+      );
+  },
+  },
+  {
+    accessorKey: "acoes",
+    header: ({}) => {
+      return (
+        <Button variant="ghost" className="w-full">
+          Ações
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="flex gap-5 justify-center ">
+        <FormSocio params={{clienteObj: row.original}}></FormSocio>
+        {/* <EditarTitulo params={{tituloObj: row.original}}></EditarTitulo>
+        <DialogDeletarTitulo tituloId={row.original.idTitulo}/> */}
+      </div>
+    ),
+  },
 ];
 
 interface PropsCliente {
   dependentes: DependentesArray;
+  socios: SocioArray
 }
 
 export function DataTableCliente({ dependentes }: PropsCliente) {

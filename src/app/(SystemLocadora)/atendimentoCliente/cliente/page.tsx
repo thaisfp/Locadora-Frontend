@@ -5,9 +5,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { DataTableCliente } from "./novoCliente/components/table-cliente";
 import { useDependenteHook } from "@/hooks/dependente";
 import { FormNovoCliente } from "./novoCliente/components/dialog-form-cliente";
+import { useSocioHook } from "@/hooks/socio";
 
 export default function Titulo() {
   const { dependentes, listarDependentes } = useDependenteHook();
+  const { socios } = useSocioHook();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +29,7 @@ export default function Titulo() {
             <FormNovoCliente />
           </div>
           <div>
-            <DataTableCliente dependentes={dependentes!} />
+            <DataTableCliente dependentes={dependentes!} socios={socios!}/>
           </div>
         </div>
       </div>
