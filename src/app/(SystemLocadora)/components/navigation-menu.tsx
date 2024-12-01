@@ -93,7 +93,15 @@ export function NavigationMenuHome() {
                     Cliente{" "}
                   </a>
                 </li>
-
+                <li className="hover:bg-accent w-full h-[30px] flex items-center justify-center rounded-sm">
+                  <a
+                    className="flex text-sm leading-tight text-muted-foreground"
+                    href="/atendimentoCliente/locacao-devolucao"
+                  >
+                    {" "}
+                    Locação/Devolução{" "}
+                  </a>
+                </li>
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
