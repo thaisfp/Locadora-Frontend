@@ -1,5 +1,5 @@
 import { Item } from "./item";
-import { Cliente } from "./cliente";
+import { Dependente } from "./dependente";
 
 export interface Locacao {
   id: string; 
@@ -8,7 +8,7 @@ export interface Locacao {
   dtDevolucaoEfetiva?: Date;
   valorCobrado: number;
   multaCobrada?: number; 
-  cliente: Cliente; 
+  cliente: Dependente; 
   item: Item;
   status: 'pendente' | 'concluido';
 }

@@ -61,7 +61,7 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
     resolver: zodResolver(formSchema),
     defaultValues: locacao
       ? {
-        cliente: locacao.cliente?.id || "",
+        cliente: locacao.cliente.nome || "",
         item: locacao.item?.id || "",
         valorCobrado: locacao.valorCobrado || 0,
         dtLocacao: locacao.dtLocacao ? new Date(locacao.dtLocacao) : undefined,
@@ -158,8 +158,8 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                           {clientes && clientes.length > 0 ? (
                             clientes.map((cliente) => (
                               <SelectItem
-                                key={cliente.id}
-                                value={cliente.id}
+                                key={cliente.numInscricao}
+                                value={cliente.numInscricao.toString()}
                               >
                                 {cliente.nome}
                               </SelectItem>
