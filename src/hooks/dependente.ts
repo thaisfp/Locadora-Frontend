@@ -1,5 +1,6 @@
 import { Dependente, DependenteCreate, DependentesArray, DependenteUpdate } from "@/model/dependente";
 import api from "@/server/server";
+import { AxiosError } from "axios";
 import { useState } from "react"
 
 export const useDependenteHook = () => {
@@ -17,8 +18,19 @@ export const useDependenteHook = () => {
     }
 
     const deletarDependente = async (dependenteId: number): Promise<void> => {
+        try {
         const response = await api.delete(`dependente/deletar/${dependenteId}`);
         return response.data;
+    } catch (error) {
+        if (error instanceof AxiosError) {
+          const erroMensagem =
+            error.response?.data?.message || "Erro desconhecido";
+          alert(`${erroMensagem}`);
+        } else {
+          alert("Erro desconhecido. Tente novamente mais tarde.");
+        }
+        throw error; 
+      }
     }
 
     const listarDependentes = async () => {

@@ -15,8 +15,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { UserPen } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Pen } from "lucide-react";
+import { useState } from "react";
 import { Cliente } from "@/model/cliente";
 import { useDependenteHook } from "@/hooks/dependente";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -33,9 +33,9 @@ export function FormNovoCliente({ cliente }: PropsCliente) {
     nome: z
       .string({ required_error: "Nome do Ator é obrigatório!" })
       .min(2, { message: "Número insuficiente de caracteres" }),
-    numInscricao: z.coerce
-      .number({ required_error: "Número da Inscrição é obrigatório!" })
-      .min(3, { message: "Quantidade de dígitos insuficientes" }),
+    numInscricao: z.coerce.number({
+      required_error: "Número da Inscrição é obrigatório!",
+    }),
     dtNascimento: z.coerce
       .date({
         errorMap: ({ code }, { defaultError }) => {
@@ -57,21 +57,20 @@ export function FormNovoCliente({ cliente }: PropsCliente) {
     resolver: zodResolver(formSchema),
     defaultValues: cliente
       ? {
-          numInscricao: cliente.numInscricao || undefined,
+          numInscricao: cliente.numInscricao || 12,
           nome: cliente.nome || "",
-          dtNascimento: cliente.dtNascimento || undefined,
+          dtNascimento: cliente.dtNascimento
+            ? new Date(cliente.dtNascimento)
+            : new Date(),
           sexo: cliente.sexo || "",
         }
-      : {},
+      : {
+          numInscricao: 0,
+          nome: "",
+          dtNascimento: new Date(),
+          sexo: "",
+        },
   });
-
-  function gerarNumeroInscricaoAleatorio() {
-    return Math.floor(Math.random() * 9000) + 1000;
-  }
-
-  useEffect(() => {
-    form.setValue("numInscricao", gerarNumeroInscricaoAleatorio());
-  }, [form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -84,9 +83,7 @@ export function FormNovoCliente({ cliente }: PropsCliente) {
           estahAtivo: cliente.estahAtivo,
         };
 
-        await editarDependente(editDependente).then((res) => {
-          console.log(res);
-
+        await editarDependente(editDependente).then(() => {
           toast({
             title: "Sucesso!",
             description: "Cliente editado com sucesso",
@@ -102,9 +99,7 @@ export function FormNovoCliente({ cliente }: PropsCliente) {
           estahAtivo: true,
         };
 
-        await criarDependente(novoDependente).then((res) => {
-          console.log(res);
-
+        await criarDependente(novoDependente).then(() => {
           toast({
             title: "Sucesso!",
             description: "cliente criado com sucesso",
@@ -129,9 +124,9 @@ export function FormNovoCliente({ cliente }: PropsCliente) {
         {cliente ? (
           <Button
             variant="outline"
-            className="bg-slate-300 hover:bg-sky-700 shadow-md w-full text-lg text-slate-50 hover:text-white"
+            className="hover:bg-slate-300 bg-sky-700 shadow-md w-full text-lg text-slate-50 hover:text-white"
           >
-            <UserPen />
+            <Pen />
           </Button>
         ) : (
           <Button
@@ -156,7 +151,7 @@ export function FormNovoCliente({ cliente }: PropsCliente) {
                         <FormLabel>Número de Inscrição</FormLabel>
                         <FormControl>
                           <Input
-                          disabled
+                            disabled
                             type="number"
                             className="border border-[#A7A7A7] "
                             {...field}

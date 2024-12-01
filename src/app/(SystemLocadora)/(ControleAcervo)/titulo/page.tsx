@@ -18,7 +18,6 @@ export default function Titulo() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log("TITULOS === ", titulos)
   return (
     <ScrollArea className="h-screen">
       <div className="w-full h-screen p-10 ">
