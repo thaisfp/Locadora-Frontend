@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import * as React from "react";
 import {
@@ -31,11 +31,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ArrowUpDown } from "lucide-react";
-import { Dependente, DependentesArray } from "@/model/dependente";
-import { FormSocio } from "./dialog-form-socio-dependentes";
-import { SocioArray } from "@/model/socio";
+import { Socio, SocioArray } from "@/model/socio";
 
-export const columns: ColumnDef<Dependente>[] = [
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { AlertDialogAtivoSocio } from "./dialog-ativo-socio";
+import { DialogDeletarSocio } from "./dialog-remover-socio";
+
+export const columns: ColumnDef<Socio>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -59,20 +66,6 @@ export const columns: ColumnDef<Dependente>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "numInscricao",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="w-full gap-2"
-      >
-        Número de Inscrição
-        <ArrowUpDown className="w-4" />
-      </Button>
-    ),
-    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.getValue("numInscricao")}</div>,
-  },
-  {
     accessorKey: "nome",
     header: ({ column }) => (
       <Button
@@ -80,14 +73,51 @@ export const columns: ColumnDef<Dependente>[] = [
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         className="w-full gap-2"
       >
-        Nome do Cliente
+        Sócio
         <ArrowUpDown className="w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div className="pl-3 flex justify-center">{row.getValue("nome")}</div>,
+    cell: ({ row }) => (
+      <div className="pl-3 flex justify-center">
+        {row.getValue("nome")}
+      </div>
+    ),
   },
   {
-    accessorKey: "dtNascimento",
+    accessorKey: "cpf",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="w-full gap-2"
+      >
+        CPF
+        <ArrowUpDown className="w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <div className="pl-3 flex justify-center">
+        {row.getValue("cpf")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "endereco",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="w-full gap-2"
+      >
+        Endereço
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <div className="pl-3 flex justify-center">{row.getValue("endereco")}</div>
+    ),
+  },
+  {
+    accessorKey: "tel",
     header: ({ column }) => {
       return (
         <Button
@@ -95,21 +125,56 @@ export const columns: ColumnDef<Dependente>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="w-full gap-2"
         >
-          Data de Nascimento
-          <ArrowUpDown className="w-4"></ArrowUpDown>
+          Telefone
         </Button>
       );
     },
-    cell: ({ row }) => {
-      const data = new Date(row.original.dtNascimento);
-      return (
-          <div className="capitalize pl-3 flex justify-center " >
-              {data.toLocaleDateString('pt-BR', {
-                  timeZone: 'UTC',
-              })}
-          </div >
-      );
   },
+  {
+    accessorKey: "dependentes",
+    header: "Dependententes",
+    cell: ({ row }) => (<div className="pl-3 flex justify-center">
+        {row.original.dependentes?.length > 0 ? row.original.dependentes.map(dependente => dependente.nome).join(", ") : "Dependente(s) não disponível"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "ativo",
+    header: ({ column }) => {
+      return (
+        <div className="flex justify-center w-20 ">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Status
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="flex justify-center items-center ">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <div
+                data-tip={row.original.estahAtivo ? "Ativo" : "Inativo"}
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "100%",
+                  backgroundColor: row.original.estahAtivo ? "#26B547" : "#FF0000",
+                }}
+              ></div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {row.original.estahAtivo ? "Ativo" : "Inativo"}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    ),
   },
   {
     accessorKey: "acoes",
@@ -122,27 +187,50 @@ export const columns: ColumnDef<Dependente>[] = [
     },
     cell: ({ row }) => (
       <div className="flex gap-5 justify-center ">
-        <FormSocio params={{clienteObj: row.original}}></FormSocio>
-        {/* <EditarTitulo params={{tituloObj: row.original}}></EditarTitulo>
-        <DialogDeletarTitulo tituloId={row.original.idTitulo}/> */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <AlertDialogAtivoSocio
+                socio={row.original}
+                ativo={row.original.estahAtivo!}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              {row.original.estahAtivo ? "Desativar" : "Ativar"}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+        <DialogDeletarSocio socioId={row.original.numInscricao} />
+        </TooltipTrigger>
+            <TooltipContent>
+              Excluir como sócio
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     ),
   },
 ];
 
 interface PropsCliente {
-  dependentes: DependentesArray;
-  socios: SocioArray
+  socios: SocioArray;
 }
 
-export function DataTableCliente({ dependentes }: PropsCliente) {
+export function DataTableSocios({ socios }: PropsCliente) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data: dependentes ?? [],
+    data: socios ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -173,16 +261,19 @@ export function DataTableCliente({ dependentes }: PropsCliente) {
         />
         <DropdownMenu>
           <DropdownMenuContent align="end">
-            {table.getAllColumns().filter((column) => column.getCanHide()).map((column) => (
-              <DropdownMenuCheckboxItem
-                key={column.id}
-                className="capitalize"
-                checked={column.getIsVisible()}
-                onCheckedChange={(value) => column.toggleVisibility(!!value)}
-              >
-                {column.id}
-              </DropdownMenuCheckboxItem>
-            ))}
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  className="capitalize"
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                >
+                  {column.id}
+                </DropdownMenuCheckboxItem>
+              ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -195,7 +286,10 @@ export function DataTableCliente({ dependentes }: PropsCliente) {
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -204,17 +298,26 @@ export function DataTableCliente({ dependentes }: PropsCliente) {
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   Nenhum resultado encontrado.
                 </TableCell>
               </TableRow>

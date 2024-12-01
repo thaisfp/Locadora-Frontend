@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { UserPen } from "lucide-react";
+import { Plus, UserPen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Dependente } from "@/model/dependente";
 import { useSocioHook } from "@/hooks/socio";
@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useDependenteHook } from "@/hooks/dependente";
+import { Socio } from "@/model/socio";
+import { maskCPF, maskPhone } from "@/lib/masks";
 
 interface ClienteProps {
   params: {
@@ -35,16 +37,21 @@ interface ClienteProps {
 }
 
 export function FormSocio({ params: { clienteObj } }: ClienteProps) {
-  const { criarSocio } = useSocioHook();
+  const { criarSocio, editarSocio, socios, listarSocios } = useSocioHook();
   const { dependentes, listarDependentes } = useDependenteHook();
   const [selectedDependentes, setSelectedDependentes] = useState<Dependente[]>(
     []
   );
   const [isOpen, setIsOpen] = useState(false);
 
+  const socioExiste = socios?.find(
+    (socio: Socio) => clienteObj.nome === socio.nome 
+  );
+
   useEffect(() => {
     const fetchData = async () => {
       await listarDependentes();
+      await listarSocios();
     };
 
     fetchData();
@@ -62,38 +69,56 @@ export function FormSocio({ params: { clienteObj } }: ClienteProps) {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      cpf: "",
-      endereco: "",
-      dependentes: [],
-    },
+    defaultValues: socioExiste
+      ? {
+          cpf: socioExiste?.cpf || "",
+          endereco: socioExiste?.endereco || "",
+          dependentes: socioExiste?.dependentes.map((dep) => dep.nome) || [],
+        }
+      : {},
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+
     const dependentesSelecionados = values.dependentes.map((nome) => {
       const dependentesEncontrados = dependentes!.find(
         (dependente) => dependente.nome === nome
       );
+
       if (!dependentesEncontrados)
-        throw new Error(`Ator com nome ${nome} não encontrado.`);
+        throw new Error(`Cliente com nome ${nome} não encontrado.`);
       return dependentesEncontrados;
     });
-    if (clienteObj) {
-      const novoSocio = {
-        numInscricao: clienteObj.numInscricao,
+    if (socioExiste) {
+      const editSocio = {
         nome: clienteObj.nome,
+        numInscricao: socioExiste!.numInscricao,
         dtNascimento: clienteObj.dtNascimento,
-        sexo: clienteObj.sexo,
-        estahAtivo: clienteObj.estahAtivo,
+        sexo: clienteObj?.sexo,
+        estahAtivo: clienteObj!.estahAtivo,
         cpf: values.cpf,
         endereco: values.endereco,
         tel: values.tel,
         dependentes: dependentesSelecionados,
       };
 
-      await criarSocio(novoSocio).then((res) => {
-        console.log(res);
+      await editarSocio(editSocio).then(() => {
+        toast({
+          title: "Sucesso!",
+          description: "Cliente editado com sucesso",
+        });
+        window.location.reload();
+      });
+    } else {
+      const novoSocio = {
+        ...clienteObj,
+        cpf: values.cpf,
+        endereco: values.endereco,
+        tel: values.tel,
+        dependentes: dependentesSelecionados,
+      };
 
+      await criarSocio(novoSocio).then(() => {
         toast({
           title: "Sucesso!",
           description: "Cliente editado com sucesso",
@@ -110,7 +135,7 @@ export function FormSocio({ params: { clienteObj } }: ClienteProps) {
         {clienteObj ? (
           <Button
             variant="outline"
-            className="bg-slate-300 hover:bg-sky-700 shadow-md w-full text-lg text-slate-50 hover:text-white"
+            className="hover:bg-slate-300 bg-sky-700 shadow-md w-full text-lg text-slate-50 hover:text-white"
           >
             <UserPen />
           </Button>
@@ -119,7 +144,7 @@ export function FormSocio({ params: { clienteObj } }: ClienteProps) {
             variant="outline"
             className="bg-sky-700 shadow-md w-1/6 text-lg text-slate-50 hover:bg-slate-400 "
           >
-            Novo Cliente
+            <Plus />
           </Button>
         )}
       </DialogTrigger>
@@ -139,6 +164,11 @@ export function FormSocio({ params: { clienteObj } }: ClienteProps) {
                           <Input
                             className="border border-[#A7A7A7] "
                             {...field}
+                            maxLength={14}
+                            onChange={(e) => {
+                              const formattedCpf = maskCPF(e.target.value);
+                              field.onChange(formattedCpf);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -171,6 +201,11 @@ export function FormSocio({ params: { clienteObj } }: ClienteProps) {
                           <Input
                             className="border border-[#A7A7A7] "
                             {...field}
+                            maxLength={14}
+                            onChange={(e) => {
+                              const formattedPhone = maskPhone(e.target.value);
+                              field.onChange(formattedPhone);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -204,6 +239,7 @@ export function FormSocio({ params: { clienteObj } }: ClienteProps) {
                             <SelectTrigger className="w-full border border-[#A7A7A7]">
                               <SelectValue
                                 placeholder={
+                                  Array.isArray(field.value) &&
                                   field.value.length > 0
                                     ? field.value.length === 1
                                       ? field.value[0]
@@ -222,13 +258,17 @@ export function FormSocio({ params: { clienteObj } }: ClienteProps) {
                                 >
                                   <Checkbox
                                     id={`checkbox-${dependente.numInscricao}`}
-                                    checked={field.value.includes(
-                                      dependente.nome
-                                    )}
+                                    checked={
+                                      Array.isArray(field.value) &&
+                                      field.value.includes(dependente.nome)
+                                    }
                                     onCheckedChange={(checked) => {
                                       const updatedValues = checked
-                                        ? [...field.value, dependente.nome]
-                                        : field.value.filter(
+                                        ? [
+                                            ...(field.value || []),
+                                            dependente.nome,
+                                          ]
+                                        : (field.value || []).filter(
                                             (nome) => nome !== dependente.nome
                                           );
 
