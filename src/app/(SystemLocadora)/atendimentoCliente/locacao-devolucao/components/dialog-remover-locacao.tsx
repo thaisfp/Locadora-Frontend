@@ -15,10 +15,10 @@ import {
   import { useRouter } from "next/navigation";
   
   interface IdLocacaoProps {
-    locacaoId: string;
+    idLocacao: string;
   }
   
-  export function DialogDeletarLocacao({ locacaoId }: IdLocacaoProps) {
+  export function DialogDeletarLocacao({ idLocacao }: IdLocacaoProps) {
     const { deletarLocacao } = useLocacaoHook();
     const router = useRouter();
   
@@ -57,7 +57,7 @@ import {
           <AlertDialogFooter className="flex gap-5">
             <AlertDialogAction
               className="bg-sky-700 hover:bg-slate-300 shadow-md w-full text-lg text-slate-50 hover:text-white"
-              onClick={() => removerLocacao(locacaoId)}
+              onClick={() => removerLocacao(idLocacao)}
             >
               Sim
             </AlertDialogAction>

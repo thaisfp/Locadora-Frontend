@@ -35,7 +35,7 @@ import { DialogDeletarLocacao } from "../components/dialog-remover-locacao";
 import { Locacao, LocacoesArray } from "@/model/locacao"; 
 
 export type Payment = {
-  id: string;
+  idLocacao: string;
   dtLocacao: Date; 
   dtDevolucaoPrevista: Date; 
   dtDevolucaoEfetiva?: Date;
@@ -150,10 +150,10 @@ export const columns: ColumnDef<Payment>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex gap-5 justify-center">
-        <Button variant="ghost" onClick={() => alert(`Editar ${row.original.id}`)}>
+        <Button variant="ghost" onClick={() => alert(`Editar ${row.original.idLocacao}`)}>
           Editar
         </Button>
-        <DialogDeletarLocacao locacaoId={row.original.id} />
+        <DialogDeletarLocacao idLocacao={row.original.idLocacao} />
       </div>
     ),
   },

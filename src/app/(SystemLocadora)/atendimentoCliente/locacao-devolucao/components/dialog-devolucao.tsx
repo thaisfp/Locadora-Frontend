@@ -4,7 +4,7 @@ import { Locacao } from '@/model/locacao';
 interface DialogDevolucaoProps {
   locacao: Locacao;
   onFechar: () => void;
-  onDevolucaoEfetuar: (id: string) => void;
+  onDevolucaoEfetuar: (idLocacao: string) => void;
 }
 
 const DialogDevolucao: React.FC<DialogDevolucaoProps> = ({ locacao, onFechar, onDevolucaoEfetuar }) => {
@@ -25,7 +25,7 @@ const DialogDevolucao: React.FC<DialogDevolucaoProps> = ({ locacao, onFechar, on
       <p>Data de Devolução Prevista: {new Date(locacao.dtDevolucaoPrevista).toLocaleDateString()}</p>
       <p>Data de Devolução Efetiva: {locacao.dtDevolucaoEfetiva ? new Date(locacao.dtDevolucaoEfetiva).toLocaleDateString() : 'Pendente'}</p>
       <p>Multa a Pagar: R${calcularMulta()}</p>
-      <button onClick={() => onDevolucaoEfetuar(locacao.id)}>Efetuar Devolução</button>
+      <button onClick={() => onDevolucaoEfetuar(locacao.idLocacao)}>Efetuar Devolução</button>
       <button onClick={onFechar}>Fechar</button>
     </div>
   );

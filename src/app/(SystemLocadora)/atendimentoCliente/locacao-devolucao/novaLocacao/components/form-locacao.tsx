@@ -78,7 +78,7 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
     try {
       if (locacao) {
         const editLocacao = {
-          id: locacao.id,
+          idLocacao: locacao.idLocacao,
           cliente: { id: values.cliente },
           item: { id: values.item },
           valorCobrado: values.valorCobrado,

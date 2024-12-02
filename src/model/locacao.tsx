@@ -2,7 +2,7 @@ import { Item } from "./item";
 import { Dependente } from "./dependente";
 
 export interface Locacao {
-  id: string; 
+  idLocacao: string; 
   dtLocacao: Date; 
   dtDevolucaoPrevista: Date; 
   dtDevolucaoEfetiva?: Date;
@@ -23,7 +23,7 @@ export interface LocacaoCreate {
 }
 
 export interface LocacaoUpdate extends LocacaoCreate{
-  id: string;     
+  idLocacao: string;     
 }
 
 export type LocacoesArray = Array<Locacao>;

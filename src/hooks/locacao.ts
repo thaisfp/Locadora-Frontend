@@ -1,4 +1,4 @@
-import { 
+import {
   Locacao,
   LocacaoCreate,
   LocacaoUpdate,
@@ -20,7 +20,7 @@ export const useLocacaoHook = () => {
     locacaoData: LocacaoUpdate
   ): Promise<Locacao> => {
     const response = await api.put(
-      `locacao/editar/${locacaoData.id}`,
+      `locacao/editar/${locacaoData.idLocacao}`,
       locacaoData
     );
     return response.data;
