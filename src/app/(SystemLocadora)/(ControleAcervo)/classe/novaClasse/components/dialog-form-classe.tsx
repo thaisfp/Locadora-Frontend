@@ -88,9 +88,9 @@ export function FormNovaClasse({ classe }: PropsClasse) {
           valor: values.valor,
           dataDevolucao: values.dataDevolucao,
         };
-
-        await criarClasse(novaClasse).then((res) => {
-          console.log(res)
+        
+        console.log("classe ==== ", novaClasse)
+        await criarClasse(novaClasse).then(() => {
 
           toast({ title: "Sucesso!", description: "Classe criada com sucesso" });
           window.location.reload();

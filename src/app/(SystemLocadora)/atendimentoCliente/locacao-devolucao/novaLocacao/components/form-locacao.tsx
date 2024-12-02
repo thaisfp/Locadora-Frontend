@@ -25,6 +25,7 @@ import {
 import { Locacao } from "@/model/locacao";
 import { useDependenteHook } from "@/hooks/dependente";
 import { useItemHook } from "@/hooks/item";
+import { UserPen } from "lucide-react";
 
 interface PropsLocacao {
   locacao?: Locacao;
@@ -35,6 +36,9 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
   const { listarDependentes, dependentes } = useDependenteHook();
   const { listarItens, itens } = useItemHook();
   const [isOpen, setIsOpen] = useState(false);
+  const [valorCobrado, setValorCobrado] = useState<number | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,20 +59,20 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
       .or(
         z.string({ required_error: "Valor é obrigatório!" }).transform(Number)
       ),
-    dtLocacao: z.preprocess(
-      (val) => (typeof val === "string" ? new Date(val) : val),
-      z.date()
-    ),
-    dtDevolucaoPrevista: z.date().refine((date) => date > new Date(), {
-      message: "Data prevista deve ser futura!",
+    dtLocacao: z.coerce.date({
+      errorMap: ({ code }, { defaultError }) => {
+        if (code === "invalid_date")
+          return { message: "Data de Locação é obrigatória" };
+        return { message: defaultError };
+      },
     }),
-    dtDevolucaoEfetiva: z
-      .preprocess(
-        (val) => (typeof val === "string" ? new Date(val) : val),
-        z.date()
-      )
-      .optional(),
-    multaCobrada: z.number().min(0, "Multa deve ser igual ou maior que zero"),
+    dtDevolucaoPrevista: z.coerce.date().refine((date) => date >= new Date(), {
+      message: "Data prevista deve ser maior ou igual a de locação!",
+    }),
+    dtDevolucaoEfetiva: z.coerce.date().refine((date) => date >= new Date(), {
+      message: "Data prevista deve ser maior ou igual a de locação!",
+    }),
+    multaCobrada: z.coerce.number(),
     status: z.enum(["pendente", "concluido"]).default("pendente"),
   });
 
@@ -78,15 +82,18 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
       ? {
           cliente: locacao.cliente.nome || "",
           item: locacao.item?.id || "",
-          valorCobrado: locacao.valorCobrado || 0,
+          valorCobrado: locacao.valorCobrado || valorCobrado,
           dtLocacao: locacao.dtLocacao
             ? new Date(locacao.dtLocacao)
-            : undefined,
+            : new Date(),
           dtDevolucaoPrevista: locacao.dtDevolucaoPrevista
             ? new Date(locacao.dtDevolucaoPrevista)
-            : undefined,
+            : new Date(),
+          dtDevolucaoEfetiva: locacao.dtDevolucaoEfetiva
+            ? new Date(locacao.dtDevolucaoEfetiva)
+            : new Date(),
           multaCobrada: locacao.multaCobrada || 0,
-          status: locacao.status || "pendente",
+          // status: locacao.status || "pendente",
         }
       : {},
   });
@@ -102,7 +109,7 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
           dtLocacao: values.dtLocacao,
           dtDevolucaoPrevista: values.dtDevolucaoPrevista,
           multaCobrada: values.multaCobrada,
-          status: values.status,
+          // status: values.status,
         };
 
         await editarLocacao(editLocacao).then((res) => {
@@ -122,9 +129,9 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
           dtLocacao: new Date(),
           dtDevolucaoPrevista: new Date(),
           multaCobrada: values.multaCobrada || 0,
-          status: values.status || "pendente",
+          // status: values.status || "pendente",
         };
-
+        console.log("nova ======= ", novaLocacao);
         await criarLocacao(novaLocacao).then((res) => {
           console.log(res);
 
@@ -151,12 +158,21 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="bg-sky-700 shadow-md w-1/6 text-lg text-slate-50 hover:bg-slate-400"
-        >
-          {locacao ? "Editar Locação" : "Nova Locação"}
-        </Button>
+        {locacao ? (
+          <Button
+            variant="outline"
+            className="bg-slate-300 hover:bg-sky-700 shadow-md w-full text-lg text-slate-50 hover:text-white"
+          >
+            <UserPen />
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            className="bg-sky-700 shadow-md w-1/6 text-lg text-slate-50 hover:bg-slate-400 "
+          >
+            Nova Locação
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <div className="grid gap-4 py-4">
@@ -207,7 +223,25 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                     <FormItem>
                       <FormLabel>Item</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          const selectedItem = itens?.find(
+                            (item) => item.id === value
+                          );
+                          field.onChange(value);
+
+                          if (selectedItem) {
+                            const valor = selectedItem.titulo.classe.valor || 0;
+                            const dataDevolucao =
+                              selectedItem.titulo.classe.dataDevolucao;
+
+                            setValorCobrado(valor);
+                            form.setValue("valorCobrado", valor);
+                            form.setValue(
+                              "dtDevolucaoPrevista",
+                              new Date(dataDevolucao)
+                            );
+                          }
+                        }}
                         value={field.value}
                       >
                         <FormControl>
@@ -219,11 +253,11 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                           {itens && itens.length > 0 ? (
                             itens.map((item) => (
                               <SelectItem key={item.id} value={item.id}>
-                                {item.nome}
+                                {item.titulo.nome}
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem disabled value={"sem-itens"}>
+                            <SelectItem disabled value="sem-itens">
                               Nenhum item encontrado
                             </SelectItem>
                           )}
@@ -234,7 +268,6 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                   )}
                 />
 
-                {/* Valor Cobrado Field */}
                 <FormField
                   control={form.control}
                   name="valorCobrado"
@@ -253,7 +286,6 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                   )}
                 />
 
-                {/* Data de Locação */}
                 <FormField
                   control={form.control}
                   name="dtLocacao"
@@ -263,11 +295,13 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                       <FormControl>
                         <Input
                           type="date"
-                          className="border border-[#A7A7A7]"
                           value={
                             field.value
                               ? field.value.toISOString().split("T")[0]
-                              : ""
+                              : new Date().toISOString().split("T")[0]
+                          }
+                          onChange={(e) =>
+                            field.onChange(new Date(e.target.value))
                           }
                         />
                       </FormControl>
@@ -276,7 +310,6 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                   )}
                 />
 
-                {/* Data de Devolução Prevista */}
                 <FormField
                   control={form.control}
                   name="dtDevolucaoPrevista"
@@ -292,6 +325,9 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                               ? field.value.toISOString().split("T")[0]
                               : ""
                           }
+                          onChange={(e) =>
+                            field.onChange(new Date(e.target.value))
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -299,7 +335,6 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                   )}
                 />
 
-                {/* Data de Devolução Efetiva */}
                 <FormField
                   control={form.control}
                   name="dtDevolucaoEfetiva"
@@ -325,7 +360,6 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                   )}
                 />
 
-                {/* Multa Cobrada */}
                 <FormField
                   control={form.control}
                   name="multaCobrada"
@@ -337,31 +371,6 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                           type="number"
                           className="border border-[#A7A7A7]"
                           {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="dtLocacao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Data de Locação</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          {...field}
-                          value={
-                            field.value
-                              ? field.value.toISOString().split("T")[0]
-                              : ""
-                          }
-                          onChange={(e) =>
-                            field.onChange(new Date(e.target.value))
-                          }
                         />
                       </FormControl>
                       <FormMessage />

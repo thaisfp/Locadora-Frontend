@@ -46,7 +46,7 @@ export type Payment = {
   status: 'pendente' | 'concluido';  
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Locacao>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -82,14 +82,14 @@ export const columns: ColumnDef<Payment>[] = [
       </Button>
     ),
     cell: ({ row }) => (
-      <div className="pl-3 flex justify-center">{row.original.cliente.id}</div>
+      <div className="pl-3 flex justify-center">{row.original.cliente.nome}</div>
     ),
   },
   {
     accessorKey: "item",
     header: "Item",
     cell: ({ row }) => (
-      <div className="pl-3 flex justify-center">{row.original.item.id}</div>
+      <div className="pl-3 flex justify-center">{row.original.item.titulo.nome}</div>
     ),
   },
   {
@@ -127,20 +127,20 @@ export const columns: ColumnDef<Payment>[] = [
       <div className="pl-3 flex justify-center">{row.original.valorCobrado}</div>
     ),
   },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.original.status;
-      const statusColor = status === "pendente" ? "text-red-500" : "text-green-500";
+  // {
+  //   accessorKey: "status",
+  //   header: "Status",
+  //   cell: ({ row }) => {
+  //     const status = row.original.status;
+  //     const statusColor = status === "pendente" ? "text-red-500" : "text-green-500";
 
-      return (
-        <div className={`capitalize pl-3 flex justify-center ${statusColor}`}>
-          {status}
-        </div>
-      );
-    },
-  },  
+  //     return (
+  //       <div className={`capitalize pl-3 flex justify-center ${statusColor}`}>
+  //         {status}
+  //       </div>
+  //     );
+  //   },
+  // },  
   {
     accessorKey: "acoes",
     header: () => (

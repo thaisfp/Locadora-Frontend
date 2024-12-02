@@ -6,10 +6,13 @@ import { FormNovaLocacao } from "../../novaLocacao/components/form-locacao"
 import { useLocacaoHook } from "@/hooks/locacao";
 
 interface EditarLocacaoProps {
-    id: string;
+    params:{
+        id: string;
+      };
 }
 
-export default function EditarLocacao({ id }: EditarLocacaoProps) {
+export default function EditarLocacao({ params }: EditarLocacaoProps) {
+    const {id} = params;
     const { locacao, selecionarLocacao } = useLocacaoHook();
     const [isLoading, setIsLoading] = useState(true);
 

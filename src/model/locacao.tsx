@@ -10,16 +10,18 @@ export interface Locacao {
   multaCobrada?: number; 
   cliente: Dependente; 
   item: Item;
-  status: 'pendente' | 'concluido';
+  // status: 'pendente' | 'concluido';
 }
 
 export interface LocacaoCreate {
   dtLocacao: Date; 
   dtDevolucaoPrevista: Date; 
+  dtDevolucaoEfetiva?: Date;
   valorCobrado: number;
+  multaCobrada?: number;
   cliente: {id: string}; 
   item: {id: string};     
-  status: 'pendente' | 'concluido';   
+  // status: 'pendente' | 'concluido';   
 }
 
 export interface LocacaoUpdate extends LocacaoCreate{
