@@ -17,7 +17,6 @@ export interface LocacaoCreate {
   dtLocacao: Date; 
   dtDevolucaoPrevista: Date; 
   valorCobrado: number;
-  multaCobrada?: number; 
   cliente: {id: string}; 
   item: {id: string};     
   status: 'pendente' | 'concluido';   

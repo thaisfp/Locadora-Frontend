@@ -82,21 +82,21 @@ export const columns: ColumnDef<Payment>[] = [
       </Button>
     ),
     cell: ({ row }) => (
-      <div className="pl-3 flex justify-center">{row.original.cliente}</div>
+      <div className="pl-3 flex justify-center">{row.original.cliente.id}</div>
     ),
   },
   {
-    accessorKey: "titulo",
-    header: "Título",
+    accessorKey: "item",
+    header: "Item",
     cell: ({ row }) => (
-      <div className="pl-3 flex justify-center">{row.original.titulo}</div>
+      <div className="pl-3 flex justify-center">{row.original.item.id}</div>
     ),
   },
   {
-    accessorKey: "dataLocacao",
+    accessorKey: "dtLocacao",
     header: "Data de Locação",
     cell: ({ row }) => {
-      const data = new Date(row.original.dataLocacao);
+      const data = new Date(row.original.dtLocacao);
       return (
         <div className="capitalize pl-3 flex justify-center ">
           {data.toLocaleDateString("pt-BR", {
@@ -107,10 +107,10 @@ export const columns: ColumnDef<Payment>[] = [
     },
   },
   {
-    accessorKey: "dataDevolucao",
+    accessorKey: "dtDevolucaoPrevista",
     header: "Data de Devolução",
     cell: ({ row }) => {
-      const data = new Date(row.original.dataDevolucao);
+      const data = new Date(row.original.dtDevolucaoPrevista);
       return (
         <div className="capitalize pl-3 flex justify-center ">
           {data.toLocaleDateString("pt-BR", {
@@ -121,10 +121,10 @@ export const columns: ColumnDef<Payment>[] = [
     },
   },
   {
-    accessorKey: "valor",
+    accessorKey: "valorCobrado",
     header: "Valor",
     cell: ({ row }) => (
-      <div className="pl-3 flex justify-center">{row.original.valor}</div>
+      <div className="pl-3 flex justify-center">{row.original.valorCobrado}</div>
     ),
   },
   {

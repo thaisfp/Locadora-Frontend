@@ -2,8 +2,8 @@
 import { Titulo } from "./titulo";
 
 export interface Item {
-  nome: ReactNode;
   id: string;
+  nome: string;
   numSerie: string;
   titulo: Titulo;
   dtAquisicao: Date;

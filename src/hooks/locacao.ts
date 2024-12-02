@@ -55,6 +55,7 @@ export const useLocacaoHook = () => {
     deletarLocacao,
     listarLocacoes,
     selecionarLocacao,
+    efetuarDevolucao,
     locacao,
     locacoes,
   };
