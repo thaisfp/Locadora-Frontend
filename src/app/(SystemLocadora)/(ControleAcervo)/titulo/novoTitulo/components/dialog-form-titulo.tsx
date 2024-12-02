@@ -77,7 +77,15 @@ export function FormNovoTitulo({ titulo }: PropsTitulo) {
             sinopse: titulo.sinopse || "",
             categoria: titulo.categoria || "",
             classe: titulo.classe.id || "",
-        } : {},
+        } : {
+            nome: "",
+            atores: [],
+            diretor: "",
+            ano: new Date().getFullYear(),
+            sinopse: "",
+            categoria: "",
+            classe: "",
+        },
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {

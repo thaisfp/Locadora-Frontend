@@ -1,7 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocacaoHook } from "@/hooks/locacao";
-import { Cliente } from "@/model/cliente";
-import { Item } from "@/model/item";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,7 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Locacao } from "@/model/locacao"
+import { Locacao } from "@/model/locacao";
+import { useDependenteHook } from "@/hooks/dependente";
+import { useItemHook } from "@/hooks/item";
 
 interface PropsLocacao {
   locacao?: Locacao;
@@ -32,17 +32,29 @@ interface PropsLocacao {
 
 export function FormNovaLocacao({ locacao }: PropsLocacao) {
   const { criarLocacao, editarLocacao } = useLocacaoHook();
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [itens, setItens] = useState<Item[]>([]);
+  const { listarDependentes, dependentes } = useDependenteHook();
+  const { listarItens, itens } = useItemHook();
   const [isOpen, setIsOpen] = useState(false);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      await listarDependentes();
+      await listarItens();
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const formSchema = z.object({
-    cliente: z.string().nonempty("Cliente é obrigatório!"),
-    item: z.string().nonempty("Item é obrigatório!"),
+    cliente: z.string({ required_error: "Cliente é obrigatório!" }),
+    item: z.string({ required_error: "Item é obrigatório!" }),
     valorCobrado: z
       .number()
       .min(1, "O valor deve ser maior que 0")
-      .or(z.string().nonempty("Valor é obrigatório!").transform(Number)),
+      .or(
+        z.string({ required_error: "Valor é obrigatório!" }).transform(Number)
+      ),
     dtLocacao: z.preprocess(
       (val) => (typeof val === "string" ? new Date(val) : val),
       z.date()
@@ -51,7 +63,10 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
       message: "Data prevista deve ser futura!",
     }),
     dtDevolucaoEfetiva: z
-      .preprocess((val) => (typeof val === "string" ? new Date(val) : val), z.date())
+      .preprocess(
+        (val) => (typeof val === "string" ? new Date(val) : val),
+        z.date()
+      )
       .optional(),
     multaCobrada: z.number().min(0, "Multa deve ser igual ou maior que zero"),
     status: z.enum(["pendente", "concluido"]).default("pendente"),
@@ -61,16 +76,18 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
     resolver: zodResolver(formSchema),
     defaultValues: locacao
       ? {
-        cliente: locacao.cliente.nome || "",
-        item: locacao.item?.id || "",
-        valorCobrado: locacao.valorCobrado || 0,
-        dtLocacao: locacao.dtLocacao ? new Date(locacao.dtLocacao) : undefined,
-        dtDevolucaoPrevista: locacao.dtDevolucaoPrevista
-          ? new Date(locacao.dtDevolucaoPrevista)
-          : undefined,
-        multaCobrada: locacao.multaCobrada || 0,
-        status: locacao.status || "pendente",
-      }
+          cliente: locacao.cliente.nome || "",
+          item: locacao.item?.id || "",
+          valorCobrado: locacao.valorCobrado || 0,
+          dtLocacao: locacao.dtLocacao
+            ? new Date(locacao.dtLocacao)
+            : undefined,
+          dtDevolucaoPrevista: locacao.dtDevolucaoPrevista
+            ? new Date(locacao.dtDevolucaoPrevista)
+            : undefined,
+          multaCobrada: locacao.multaCobrada || 0,
+          status: locacao.status || "pendente",
+        }
       : {},
   });
 
@@ -89,12 +106,14 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
         };
 
         await editarLocacao(editLocacao).then((res) => {
-          console.log(res)
+          console.log(res);
 
-          toast({ title: "Sucesso!", description: "Locação editado com sucesso" });
+          toast({
+            title: "Sucesso!",
+            description: "Locação editado com sucesso",
+          });
           window.location.reload();
-        })
-
+        });
       } else {
         const novaLocacao = {
           cliente: { id: values.cliente },
@@ -103,15 +122,18 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
           dtLocacao: new Date(),
           dtDevolucaoPrevista: new Date(),
           multaCobrada: values.multaCobrada || 0,
-          status: values.status || 'pendente',
+          status: values.status || "pendente",
         };
 
         await criarLocacao(novaLocacao).then((res) => {
-          console.log(res)
+          console.log(res);
 
-          toast({ title: "Sucesso!", description: "Locação criada com sucesso!" });
+          toast({
+            title: "Sucesso!",
+            description: "Locação criada com sucesso!",
+          });
           window.location.reload();
-        })
+        });
       }
 
       setIsOpen(false);
@@ -141,22 +163,24 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <div className="flex flex-col space-y-4">
-                {/* Cliente Field */}
                 <FormField
                   control={form.control}
                   name="cliente"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Cliente</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger className="w-full border border-[#A7A7A7]">
                             <SelectValue placeholder="Selecione um cliente" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {clientes && clientes.length > 0 ? (
-                            clientes.map((cliente) => (
+                          {dependentes && dependentes.length > 0 ? (
+                            dependentes.map((cliente) => (
                               <SelectItem
                                 key={cliente.numInscricao}
                                 value={cliente.numInscricao.toString()}
@@ -176,14 +200,16 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                   )}
                 />
 
-                {/* Item Field */}
                 <FormField
                   control={form.control}
                   name="item"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Item</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger className="w-full border border-[#A7A7A7]">
                             <SelectValue placeholder="Selecione um item" />
@@ -328,15 +354,20 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                         <Input
                           type="date"
                           {...field}
-                          value={field.value ? field.value.toISOString().split("T")[0] : ""}
-                          onChange={(e) => field.onChange(new Date(e.target.value))}
+                          value={
+                            field.value
+                              ? field.value.toISOString().split("T")[0]
+                              : ""
+                          }
+                          onChange={(e) =>
+                            field.onChange(new Date(e.target.value))
+                          }
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
               </div>
 
               <div className="flex justify-end space-x-4">
@@ -355,4 +386,4 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
       </DialogContent>
     </Dialog>
   );
-};
+}
