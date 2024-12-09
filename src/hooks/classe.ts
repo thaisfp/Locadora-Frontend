@@ -7,6 +7,8 @@ export const useClasseHook = () => {
     const [classes, setClasses] = useState<ClassesArray | null>(null);
 
     const criarClasse = async (classe: ClasseCreate): Promise<Classe> => {
+        console.log("DATA ======", classe);
+
         const response = await api.post('classe/criar', classe);
         return response.data;
     };

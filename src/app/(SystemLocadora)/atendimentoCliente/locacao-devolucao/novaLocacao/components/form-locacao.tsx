@@ -23,8 +23,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Locacao } from "@/model/locacao";
-import { useDependenteHook } from "@/hooks/dependente";
 import { useItemHook } from "@/hooks/item";
+import { useClienteHook } from "@/hooks/cliente";
 import { UserPen } from "lucide-react";
 
 interface PropsLocacao {
@@ -33,16 +33,18 @@ interface PropsLocacao {
 
 export function FormNovaLocacao({ locacao }: PropsLocacao) {
   const { criarLocacao, editarLocacao } = useLocacaoHook();
-  const { listarDependentes, dependentes } = useDependenteHook();
+  const { listarClientes, clientes } = useClienteHook();
   const { listarItens, itens } = useItemHook();
   const [isOpen, setIsOpen] = useState(false);
   const [valorCobrado, setValorCobrado] = useState<number | undefined>(
     undefined
   );
+  const [isDevolucao, setIsDevolucao] = useState(false);
+  const [multaCobrada, setMultaCobrada] = useState<number | null>(0);
 
   useEffect(() => {
     const fetchData = async () => {
-      await listarDependentes();
+      await listarClientes();
       await listarItens();
     };
 
@@ -66,14 +68,19 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
         return { message: defaultError };
       },
     }),
-    dtDevolucaoPrevista: z.coerce.date().refine((date) => date >= new Date(), {
-      message: "Data prevista deve ser maior ou igual a de locação!",
+    dtDevolucaoPrevista: z.coerce.date().refine((date) => date > new Date(), {
+      message:
+        "Data de Devolução Prevista deve ser maior que a data de locação!",
     }),
-    dtDevolucaoEfetiva: z.coerce.date().refine((date) => date >= new Date(), {
-      message: "Data prevista deve ser maior ou igual a de locação!",
-    }),
-    multaCobrada: z.coerce.number(),
-    status: z.enum(["pendente", "concluido"]).default("pendente"),
+    dtDevolucaoEfetiva: z.coerce
+      .date()
+      .refine((date) => date >= new Date(), {
+        message:
+          "Data de Devolução Efetiva deve ser maior ou igual que a data de locação!",
+      })
+      .optional(),
+    multaCobrada: z.coerce.number().optional(),
+    devolver: z.boolean().optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -93,23 +100,45 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
             ? new Date(locacao.dtDevolucaoEfetiva)
             : new Date(),
           multaCobrada: locacao.multaCobrada || 0,
-          // status: locacao.status || "pendente",
         }
       : {},
   });
 
+  const calcularMulta = (
+    dtDevolucaoEfetiva: Date,
+    dtDevolucaoPrevista: Date
+  ) => {
+    if (dtDevolucaoEfetiva > dtDevolucaoPrevista) {
+      const diffInMs =
+        dtDevolucaoEfetiva.getTime() - dtDevolucaoPrevista.getTime();
+      const diasAtraso = Math.floor(diffInMs / (1000 * 3600 * 24));
+
+      return diasAtraso * 5;
+    }
+    return 0;
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      if (values.dtDevolucaoEfetiva && values.dtDevolucaoPrevista) {
+        const multaCalculada = calcularMulta(
+          new Date(values.dtDevolucaoEfetiva),
+          new Date(values.dtDevolucaoPrevista)
+        );
+        setMultaCobrada(multaCalculada);
+        form.setValue("multaCobrada", multaCalculada);
+      }
+
       if (locacao) {
         const editLocacao = {
           idLocacao: locacao.idLocacao,
-          cliente: { id: values.cliente },
+          cliente: { numInscricao: Number(values.cliente) },
           item: { id: values.item },
           valorCobrado: values.valorCobrado,
           dtLocacao: values.dtLocacao,
           dtDevolucaoPrevista: values.dtDevolucaoPrevista,
-          multaCobrada: values.multaCobrada,
-          // status: values.status,
+          multaCobrada: multaCobrada!,
+          dtDevolucaoEfetiva: values.dtDevolucaoEfetiva,
         };
 
         await editarLocacao(editLocacao).then((res) => {
@@ -123,15 +152,14 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
         });
       } else {
         const novaLocacao = {
-          cliente: { id: values.cliente },
+          cliente: { numInscricao: Number(values.cliente) },
           item: { id: values.item },
           valorCobrado: values.valorCobrado,
-          dtLocacao: new Date(),
-          dtDevolucaoPrevista: new Date(),
+          dtLocacao: values.dtLocacao,
+          dtDevolucaoPrevista: values.dtDevolucaoPrevista,
           multaCobrada: values.multaCobrada || 0,
-          // status: values.status || "pendente",
+          dtDevolucaoEfetiva: values.dtDevolucaoEfetiva,
         };
-        console.log("nova ======= ", novaLocacao);
         await criarLocacao(novaLocacao).then((res) => {
           console.log(res);
 
@@ -195,8 +223,8 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {dependentes && dependentes.length > 0 ? (
-                            dependentes.map((cliente) => (
+                          {clientes && clientes.length > 0 ? (
+                            clientes.map((cliente) => (
                               <SelectItem
                                 key={cliente.numInscricao}
                                 value={cliente.numInscricao.toString()}
@@ -337,57 +365,90 @@ export function FormNovaLocacao({ locacao }: PropsLocacao) {
 
                 <FormField
                   control={form.control}
-                  name="dtDevolucaoEfetiva"
+                  name="devolver"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Data de Devolução Efetiva</FormLabel>
+                    <FormItem className="flex gap-2">
+                      <FormLabel className="pt-2">Devolver?</FormLabel>
                       <FormControl>
                         <Input
-                          type="date"
-                          className="border border-[#A7A7A7]"
-                          value={
-                            field.value instanceof Date
-                              ? field.value.toISOString().split("T")[0]
-                              : ""
-                          }
-                          onChange={(e) =>
-                            field.onChange(new Date(e.target.value))
-                          }
+                          className="w-4 h-4 "
+                          type="checkbox"
+                          checked={field.value || isDevolucao}
+                          onChange={(e) => {
+                            field.onChange(e.target.checked);
+                            setIsDevolucao(e.target.checked);
+                          }}
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="multaCobrada"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Multa Cobrada</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          className="border border-[#A7A7A7]"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {isDevolucao && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="dtDevolucaoEfetiva"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Data de Devolução Efetiva</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="date"
+                              className="border border-[#A7A7A7]"
+                              value={
+                                field.value instanceof Date
+                                  ? field.value.toISOString().split("T")[0]
+                                  : ""
+                              }
+                              onChange={(e) =>
+                                field.onChange(new Date(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="multaCobrada"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Multa Cobrada</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              className="border border-[#B2B2B2]"
+                              placeholder="Multa cobrada"
+                              {...field}
+                              value={multaCobrada!}
+                              readOnly
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
               </div>
 
-              <div className="flex justify-end space-x-4">
+              <div className="flex w-full items-center justify-center gap-5">
+                <Button
+                  type="submit"
+                  className="bg-sky-700 shadow-md w-1/2 text-lg hover:bg-slate-400 "
+                >
+                  Salvar
+                </Button>
                 <Button
                   type="button"
-                  variant="outline"
+                  className="bg-slate-400  shadow-md w-1/2 text-lg "
                   onClick={() => setIsOpen(false)}
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Salvar</Button>
               </div>
             </form>
           </Form>

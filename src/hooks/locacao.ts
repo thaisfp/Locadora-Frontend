@@ -5,6 +5,7 @@ import {
   LocacoesArray,
 } from "@/model/locacao";
 import api from "@/server/server";
+import { AxiosError } from "axios";
 import { useState } from "react";
 
 export const useLocacaoHook = () => {
@@ -12,16 +13,27 @@ export const useLocacaoHook = () => {
   const [locacoes, setLocacoes] = useState<LocacoesArray | null>(null);
 
   const criarLocacao = async (locacaoData: LocacaoCreate): Promise<Locacao> => {
-    const response = await api.post("locacao/criar", locacaoData);
-    return response.data;
+    try {
+      const response = await api.post("locacao/criar", locacaoData);
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const erroMensagem =
+          error.response?.data?.message || "Erro desconhecido";
+        alert(`${erroMensagem}`);
+      } else {
+        alert("Erro desconhecido. Tente novamente mais tarde.");
+      }
+      throw error;
+    }
   };
 
   const editarLocacao = async (
     locacaoData: LocacaoUpdate
   ): Promise<Locacao> => {
+    console.log("locacaoData", locacaoData);
     const response = await api.put(
-      `locacao/editar/${locacaoData.idLocacao}`,
-      locacaoData
+      `locacao/editar`, locacaoData
     );
     return response.data;
   };

@@ -61,6 +61,28 @@ export const useTituloHook = () => {
         }
     };
 
+    const buscarPorNome = async (nome: string): Promise<void> => {
+        const response = await api.get(`titulo/listar/tituloNome/${nome}`);
+        if (response.data) {
+            setTitulos(response.data);
+        }
+    };
+
+    const buscarPorCategoria = async (categoria: string): Promise<void> => {
+        const response = await api.get(`titulo/listar/tituloCategoria/${categoria}`);
+        if (response.data) {
+            setTitulos(response.data);
+        }
+    };
+
+    const buscarPorAtor = async (ator: string): Promise<void> => {
+        console.log("ATOR: ",ator);
+        const response = await api.get(`titulo/listar/tituloAtor/${ator}`);
+        if (response.data) {
+            setTitulos(response.data);
+        }
+    };
+
     return {
         criarTitulo,
         editarTitulo,
@@ -75,5 +97,8 @@ export const useTituloHook = () => {
         atores,
         diretores,
         classes,
+        buscarPorNome,
+        buscarPorCategoria,
+        buscarPorAtor
     };
 };

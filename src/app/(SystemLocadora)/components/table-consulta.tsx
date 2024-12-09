@@ -31,29 +31,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ArrowUpDown } from "lucide-react";
-import { DialogDeletarLocacao } from "../components/dialog-remover-locacao";
-import { Locacao, LocacoesArray } from "@/model/locacao";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import EditarLocacao from "../editarLocacao/[id]/page";
+import { Titulo, TitulosArray } from "@/model/titulo";
+import { Ator } from "@/model/ator";
+import { Classe } from "@/model/classe";
+import { Diretor } from "@/model/diretor";
 
 export type Payment = {
-  idLocacao: string;
-  dtLocacao: Date;
-  dtDevolucaoPrevista: Date;
-  dtDevolucaoEfetiva?: Date;
-  valorCobrado: number;
-  multaCobrada?: number;
-  cliente: { id: string };
-  item: { id: string };
-  status: "pendente" | "concluido";
+  id: string;
+  nome: string;
+  atores: Array<Ator>;
+  diretor: Diretor;
+  ano: number;
+  sinopse: string;
+  categoria: string;
+  classe: Classe;
 };
 
-export const columns: ColumnDef<Locacao>[] = [
+export const columns: ColumnDef<Titulo>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -77,143 +71,91 @@ export const columns: ColumnDef<Locacao>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "cliente",
+    accessorKey: "nome",
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         className="w-full gap-2"
       >
-        Cliente
+        Nome do Título
         <ArrowUpDown className="w-4" />
       </Button>
     ),
     cell: ({ row }) => (
+      <div className="pl-3 flex justify-center">{row.getValue("nome")}</div>
+    ),
+  },
+  {
+    accessorKey: "atores",
+    header: "Atores",
+    cell: ({ row }) => (
       <div className="pl-3 flex justify-center">
-        {row.original.cliente.nome}
+        {row.original.atores?.length > 0
+          ? row.original.atores.map((ator) => ator.nome).join(", ")
+          : "Ator(es) não disponível"}
       </div>
     ),
   },
   {
-    accessorKey: "item",
-    header: "Item",
+    accessorKey: "diretor",
+    header: "Diretor",
     cell: ({ row }) => (
       <div className="pl-3 flex justify-center">
-        {row.original.item.titulo.nome}
+        {row.original.diretor
+          ? row.original.diretor.nome
+          : "Diretor não disponível"}
       </div>
     ),
   },
   {
-    accessorKey: "dtLocacao",
-    header: "Data de Locação",
-    cell: ({ row }) => {
-      const data = new Date(row.original.dtLocacao);
-      return (
-        <div className="capitalize pl-3 flex justify-center ">
-          {data.toLocaleDateString("pt-BR", {
-            timeZone: "UTC",
-          })}
-        </div>
-      );
-    },
+    accessorKey: "ano",
+    header: "Ano",
+    cell: ({ row }) => (
+      <div className="pl-3 flex justify-center">{row.getValue("ano")}</div>
+    ),
   },
   {
-    accessorKey: "dtDevolucaoPrevista",
-    header: "Data de Devolução",
-    cell: ({ row }) => {
-      const data = new Date(row.original.dtDevolucaoPrevista);
-      return (
-        <div className="capitalize pl-3 flex justify-center ">
-          {data.toLocaleDateString("pt-BR", {
-            timeZone: "UTC",
-          })}
-        </div>
-      );
-    },
+    accessorKey: "sinopse",
+    header: "Sinopse",
+    cell: ({ row }) => <div className="pl-3">{row.getValue("sinopse")}</div>,
   },
   {
-    accessorKey: "dtDevolucaoEfetiva",
-    header: "Data de Devolução Efetiva",
-    cell: ({ row }) => {
-      const data = row.original.dtDevolucaoEfetiva;
-
-      return (
-        <div className="capitalize pl-3 flex justify-center">
-          {data
-            ? new Date(data).toLocaleDateString("pt-BR", { timeZone: "UTC" })
-            : ""}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const data = row.original.dtDevolucaoEfetiva;
-
-      return (
-        <div className="capitalize pl-3 flex justify-center">
-          {data ? (
-            <h1 className="flex bg-green-200 w-full rounded-lg text-lg text-slate-50 hover:text-white justify-center">
-              Pago
-            </h1>
-          ) : (
-            <h1 className="flex bg-red-200 w-full rounded-lg text-lg text-slate-50 justify-center">
-              pendente
-            </h1>
-          )}
-        </div>
-      );
-    },
-  },
-
-  {
-    accessorKey: "valorCobrado",
-    header: "Valor Total",
+    accessorKey: "categoria",
+    header: "Categoria",
     cell: ({ row }) => (
       <div className="pl-3 flex justify-center">
-        {row.original.valorCobrado + (row.original.multaCobrada || 0)}
+        {row.getValue("categoria")}
       </div>
     ),
   },
-
   {
-    accessorKey: "acoes",
-    header: () => (
-      <Button variant="ghost" className="w-full">
-        Ações
-      </Button>
-    ),
+    accessorKey: "classe",
+    header: "Classe",
     cell: ({ row }) => (
-      <div className="flex gap-5 justify-center">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <EditarLocacao params={{ id: row.original.idLocacao }} />
-            </TooltipTrigger>
-            <TooltipContent>Editar/Efetivar Devolução</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <DialogDeletarLocacao idLocacao={row.original.idLocacao} />
-            </TooltipTrigger>
-            <TooltipContent>Cancelar Locação</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      <div className="pl-3 flex justify-center">
+        {row.original.classe
+          ? row.original.classe.nome
+          : "Classe não disponível"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "valorLocacao",
+    header: "Valor da Locação",
+    cell: ({ row }) => (
+      <div className="pl-3 flex justify-center">
+        {row.original.classe.valor}
       </div>
     ),
   },
 ];
 
-interface LocacaoProps {
-  locacoes: LocacoesArray;
+interface PropsTitulo {
+  titulos: TitulosArray;
 }
 
-export function DataTableLocacao({ locacoes }: LocacaoProps) {
+export function DataTableTituloConsulta({ titulos }: PropsTitulo) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -223,7 +165,7 @@ export function DataTableLocacao({ locacoes }: LocacaoProps) {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data: locacoes ?? [],
+    data: titulos ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -245,10 +187,10 @@ export function DataTableLocacao({ locacoes }: LocacaoProps) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filtrar por cliente..."
-          value={(table.getColumn("cliente")?.getFilterValue() as string) ?? ""}
+          placeholder="Filtrar por nome..."
+          value={(table.getColumn("nome")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("cliente")?.setFilterValue(event.target.value)
+            table.getColumn("nome")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
